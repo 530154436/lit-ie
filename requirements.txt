@@ -1,0 +1,15 @@
+colorama
+colorlog
+datasets
+jieba
+pypinyin
+pytorch_lightning
+scikit_learn
+scipy
+seaborn
+sentencepiece
+setuptools
+spacy
+streamlit
+torchmetrics
+transformers
