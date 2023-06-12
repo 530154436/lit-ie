@@ -10,6 +10,6 @@ seaborn
 sentencepiece
 setuptools
 spacy
-streamlit
 torchmetrics
 transformers
+gradio

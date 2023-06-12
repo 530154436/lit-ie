@@ -84,17 +84,18 @@ class NerDataModule(TaskDataModule):
             num_proc=self.num_workers if self.num_workers else None,
         )
 
-        for index in random.sample(range(len(train_dataset)), 1):
-            logger.info(f"Length of training set: {len(train_dataset)}")
-            logger.info(f"Sample {index} of the training set:")
-            for k, v in train_dataset[index].items():
-                logger.info(f"{k} = {v}")
+        if self.task_name not in ["cnn", "mrc", "w2ner"]:
+            for index in random.sample(range(len(train_dataset)), 1):
+                logger.info(f"Length of training set: {len(train_dataset)}")
+                logger.info(f"Sample {index} of the training set:")
+                for k, v in train_dataset[index].items():
+                    logger.info(f"{k} = {v}")
 
-        for index in random.sample(range(len(val_dataset)), 1):
-            logger.info(f"Length of validation set: {len(val_dataset)}")
-            logger.info(f"Sample {index} of the validation set:")
-            for k, v in val_dataset[index].items():
-                logger.info(f"{k} = {v}")
+            for index in random.sample(range(len(val_dataset)), 1):
+                logger.info(f"Length of validation set: {len(val_dataset)}")
+                logger.info(f"Sample {index} of the validation set:")
+                for k, v in val_dataset[index].items():
+                    logger.info(f"{k} = {v}")
 
         all_dataset = {"train": train_dataset, "validation": val_dataset}
 

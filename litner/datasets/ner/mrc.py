@@ -7,7 +7,6 @@ from transformers import PreTrainedTokenizerBase
 from transformers.file_utils import PaddingStrategy
 
 from .base import NerDataModule
-from ..utils import batchify_ner_labels
 
 
 @dataclass
@@ -38,7 +37,15 @@ class DataCollatorForMrcNer:
         )
 
         if labels is None:  # for test
-            return batchify_ner_labels(batch, features, return_offset_mapping=True)
+            if "text" in features[0].keys():
+                batch["texts"] = [feature["text"] for feature in features for _ in range(self.num_labels)]
+            if "offset_mapping" in features[0].keys():
+                batch["offset_mapping"] = [feature["offset_mapping"][i] for feature in features for i in
+                                           range(self.num_labels)]
+            if "target" in features[0].keys():
+                batch['target'] = [{tuple([t[0], int(t[1]), int(t[2]), t[3]]) for t in feature.pop("target")} for
+                                   feature in features]
+            return batch
 
         batch_start_positions = torch.zeros_like(batch["input_ids"])
         batch_end_positions = torch.zeros_like(batch["input_ids"])

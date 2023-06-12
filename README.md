@@ -10,7 +10,19 @@
     <a href="https://github.com/xusenlinzy/lit-ner"><img src="https://img.shields.io/badge/langurage-py-brightgreen?style=flat&color=blue"></a>
 </p>
 
-此项目为开源**命名实体识别**模型的训练和推理提供统一框架
+此项目为开源**命名实体识别**模型的训练和推理提供统一的框架，具有以下特性
+
+
++ ✨ 支持多种开源实体抽取模型
+
+
++ 🚀 统一的训练和推理框架
+
+
+## 📢 News 
+
++ 【2023.6.12】 提交初版代码
+
 
 ---
 
@@ -52,7 +64,6 @@ pip install litner
 ## 📚 数据
 
 将数据集处理成以下 `json` 格式
-
 
 ```json
 {

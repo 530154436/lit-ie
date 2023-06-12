@@ -17,7 +17,7 @@ install_requires = [
     "sentencepiece",
     "setuptools",
     "spacy",
-    "streamlit",
+    "gradio",
     "torchmetrics",
     "transformers",
 ]

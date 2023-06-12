@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Optional, Any, Union, List, Dict
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
@@ -41,6 +41,7 @@ class BaseModel:
         data_args: DataTrainingArguments,
         is_chinese: Optional[bool] = False,
         cache_dir: Optional[str] = None,
+        labels: Optional[Union[Dict[str, int], List[Any]]] = None,
     ):
         raise NotImplementedError
 
@@ -49,13 +50,14 @@ class BaseModel:
         data_args: DataTrainingArguments,
         is_chinese: Optional[bool] = False,
         cache_dir: Optional[str] = None,
+        labels: Optional[Union[Dict[str, int], List[Any]]] = None,
         **trainer_kwargs,
     ):
         if self.tokenizer is None and self.model_name_or_path is not None:
             tokenizer_cls = TOKENIZER_MAP.get(self.model_type, BertTokenizerFast)
             self.tokenizer = tokenizer_cls.from_pretrained(self.model_name_or_path)
 
-        self.data_module = self.create_data_module(data_args, is_chinese, cache_dir)
+        self.data_module = self.create_data_module(data_args, is_chinese, cache_dir, labels=labels)
         self.engine = self.create_engine()
         trainer = self.make_trainer(**trainer_kwargs)
 
