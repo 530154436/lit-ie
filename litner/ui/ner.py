@@ -41,6 +41,7 @@ class NerPlayground:
     def __init__(self, server_name="0.0.0.0", server_port=7860, title=None, **kwargs):
         self.server_name = server_name
         self.server_port = server_port
+
         self.title = title
         self.kwargs = kwargs
 
@@ -51,15 +52,38 @@ class NerPlayground:
         demo = gr.Interface(
             extract,
             [
-                gr.Textbox(placeholder="Enter sentence here...", lines=5),
-                gr.Textbox(placeholder="Enter model path here..."),
-                gr.Radio(["bert", "ernie", "roformer", "nezha", "chinese-bert"], value="bert"),
-                gr.Radio(["crf", "cascade_crf", "softmax", "span", "global_pointer",
-                          "mrc", "tplinker", "lear", "w2ner", "cnn"], value="crf"),
-                gr.Slider(0, 512, value=256),
-                gr.Radio(["cpu", "cuda"], value="cpu"),
-                gr.Checkbox(label="smart split sentence?"),
-                gr.Checkbox(label="use fp16 speed strategy?"),
+                gr.Textbox(
+                    placeholder="Enter sentence here...",
+                    lines=5
+                ),
+                gr.Textbox(
+                    placeholder="Enter model path here..."
+                ),
+                gr.Radio(
+                    ["bert", "ernie", "roformer", "nezha", "chinese-bert"],
+                    value="bert"
+                ),
+                gr.Radio(
+                    ["crf", "cascade_crf", "softmax", "span", "global_pointer",
+                     "mrc", "tplinker", "lear", "w2ner", "cnn"],
+                    value="crf"
+                ),
+                gr.Slider(
+                    0,
+                    512,
+                    value=256,
+                    interactive=True,
+                ),
+                gr.Radio(
+                    ["cpu", "cuda"],
+                    value="cpu",
+                ),
+                gr.Checkbox(
+                    label="smart split sentence?"
+                ),
+                gr.Checkbox(
+                    label="use fp16 speed strategy?"
+                ),
             ],
             [gr.Number(label="Run Time"), gr.Json(label="Result"), gr.HTML(label="Visualize")],
             examples=[

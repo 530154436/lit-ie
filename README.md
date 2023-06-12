@@ -28,16 +28,6 @@
 
 ## 🔨 安装
 
-1. `pytorch`
-
-```bash
-conda create -n pytorch python=3.8
-conda activate pytorch
-conda install pytorch cudatoolkit -c pytorch
-```
-
-2. 安装 `litner`
-
 ```bash
 pip install litner
 ```
@@ -90,7 +80,6 @@ pip install litner
 字段含义：
 
 + `text`: 文本内容
-
 
 + `entities`: 该文本所包含的所有实体
 
@@ -150,6 +139,15 @@ model_name_or_path = "path of crf model"
 pipeline = NerPipeline(task_model, model_name_or_path=model_name_or_path)
 
 print(pipeline("结果上周六他们主场0：3惨败给了中游球队瓦拉多利德，近7个多月以来西甲首次输球。"))
+```
+
+
+web demo
+
+```python
+from litner.ui import NerPlayground
+
+NerPlayground().launch()
 ```
   
 
