@@ -12,19 +12,11 @@
 
 此项目为开源**命名实体识别**模型的训练和推理提供统一框架
 
-
-## 📢 News 
-
-+ 2023.6.12 使用 [m3e](https://huggingface.co/moka-ai/m3e-base) 中文嵌入模型（在中文文本分类和文本检索上都优于 `openai-ada-002`）
-
-
-+ 2023.6.10 新增 [OpenBuddy](https://github.com/OpenBuddy/OpenBuddy) 仓库训练的中文模型
-
 ---
 
 ## 🔨 安装
 
-1. 搭建好 `pytorch` 深度学习环境
+1. `pytorch`
 
 ```bash
 conda create -n pytorch python=3.8
@@ -36,21 +28,6 @@ conda install pytorch cudatoolkit -c pytorch
 
 ```bash
 pip install litner
-```
-
-3. 在 `https://pytorch-geometric.com/whl/` 中找到与 `torch` 版本对应的 `torch_scatter`，下载后使用 `pip` 安装到环境中 
-
-```python
-import torch
-
-print(torch.__version__)  # 1.12.0
-print(torch.version.cuda)  # 11.3
-```
-
-```bash
-# 以python=3.8, torch=1.12.0, cuda=11.3为例
-wget https://data.pyg.org/whl/torch-1.12.0%2Bcu113/torch_scatter-2.1.0%2Bpt112cu113-cp38-cp38-linux_x86_64.whl
-pip install torch_scatter-2.1.0+pt112cu113-cp38-cp38-linux_x86_64.whl
 ```
 
 
