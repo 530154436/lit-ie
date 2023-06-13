@@ -91,7 +91,7 @@ def get_auto_tplinker_ner_model(model_type: str = "bert"):
 
             seqlens, shaking_logits = tensor_to_cpu(attention_mask.sum(1)), tensor_to_cpu(shaking_logits)
             shaking_idx2matrix_idx = [(s, e) for s in range(seq_len) for e in list(range(seq_len))[s:]]
-            id2label = {int(v): k for k, v in self.config.label2id.items()}
+            id2label = {int(v): k for k, v in self.config.tplinker_label2id.items()}
 
             for _shaking_logits, l, text, mapping in zip(shaking_logits, seqlens, texts, offset_mapping):
                 entities = set()
@@ -145,7 +145,7 @@ def get_tplinker_ner_model_config(labels: list, **kwargs):
     label2id = {v: i for i, v in enumerate(labels)}
     model_config = {
         "num_labels": len(labels),
-        "label2id": label2id,
+        "tplinker_label2id": label2id,
         "shaking_type": "cln",
         "decode_thresh": 0.,
     }

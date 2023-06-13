@@ -209,7 +209,7 @@ def get_auto_w2ner_ner_model(model_type: str = "bert"):
         def decode(self, logits, input_lengths, texts):
             decode_labels = []
             logits, input_lengths = tensor_to_cpu(logits.argmax(-1)), tensor_to_cpu(input_lengths)
-            id2label = {int(v): k for k, v in self.config.label2id.items()}
+            id2label = {int(v): k for k, v in self.config.w2ner_label2id.items()}
 
             for _logits, length, text in zip(logits, input_lengths, texts):
                 forward_dict, head_dict, ht_type_dict = {}, {}, {}
@@ -280,7 +280,7 @@ def get_w2ner_model_config(labels: list, **kwargs):
     label2id = {v: i for i, v in enumerate(w2ner_labels)}
     model_config = {
         "num_labels": len(w2ner_labels),
-        "label2id": label2id,
+        "w2ner_label2id": label2id,
         "use_last_4_layers": False,
         "dist_emb_size": 20,
         "type_emb_size": 20,

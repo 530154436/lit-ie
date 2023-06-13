@@ -221,7 +221,7 @@ def get_auto_prgc_re_model(model_type: str = "bert"):
             rel_threshold = getattr(self.config, "rel_threshold", 0.1)
             corres_threshold = getattr(self.config, "corres_threshold", 0.5)
 
-            id2label = {int(v): k for k, v in self.config.label2id.items()}
+            id2label = {int(v): k for k, v in self.config.prgc_label2id.items()}
             id2predicate = {int(v): k for k, v in self.config.predicate2id.items()}
 
             decode_labels = []
@@ -304,7 +304,7 @@ def get_prgc_re_model_config(predicates, **kwargs):
     model_config = {
         "num_predicates": len(predicates),
         "predicate2id": predicate2id,
-        "label2id": label2id,
+        "prgc_label2id": label2id,
         "rel_threshold": 0.1,
         "corres_threshold": 0.5,
         "emb_fusion": "concat",

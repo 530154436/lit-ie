@@ -121,7 +121,7 @@ def get_auto_grte_re_model(model_type: str = "bert"):
             for _logits, length, text, mapping in zip(logits, seqlens, texts, offset_mapping):
                 tmp = []
                 length = length.item()
-                for s, e, r in zip(*torch.where(_logits != self.config.label2id["N/A"])):
+                for s, e, r in zip(*torch.where(_logits != self.config.grte_label2id["N/A"])):
                     s, e, r = s.item(), e.item(), r.item()
                     if length - 1 <= s or length - 1 <= e or 0 in [s, e]:
                         continue
@@ -129,33 +129,33 @@ def get_auto_grte_re_model(model_type: str = "bert"):
 
                 spoes = set()
                 for s, e, r in tmp:
-                    if _logits[s, e, r] == self.config.label2id["SS"]:
+                    if _logits[s, e, r] == self.config.grte_label2id["SS"]:
                         spoes.add((
                             id2predicate[r],
                             text[mapping[s][0]: mapping[s][1]],
                             text[mapping[e][0]: mapping[e][1]]
                         ))
-                    elif _logits[s, e, r] == self.config.label2id["SMH"]:
+                    elif _logits[s, e, r] == self.config.grte_label2id["SMH"]:
                         for s_, e_, r_ in tmp:
-                            if r == r_ and _logits[s_, e_, r_] == self.config.label2id["SMT"] and s_ == s and e_ > e:
+                            if r == r_ and _logits[s_, e_, r_] == self.config.grte_label2id["SMT"] and s_ == s and e_ > e:
                                 spoes.add((
                                     id2predicate[r],
                                     text[mapping[s][0]: mapping[s][1]],
                                     text[mapping[e][0]: mapping[e_][1]]
                                 ))
                                 break
-                    elif _logits[s, e, r] == self.config.label2id["MMH"]:
+                    elif _logits[s, e, r] == self.config.grte_label2id["MMH"]:
                         for s_, e_, r_ in tmp:
-                            if r == r_ and _logits[s_, e_, r_] == self.config.label2id["MMT"] and s_ > s and e_ > e:
+                            if r == r_ and _logits[s_, e_, r_] == self.config.grte_label2id["MMT"] and s_ > s and e_ > e:
                                 spoes.add((
                                     id2predicate[r],
                                     text[mapping[s][0]: mapping[s_][1]],
                                     text[mapping[e][0]: mapping[e_][1]]
                                 ))
                                 break
-                    elif _logits[s, e, r] == self.config.label2id["MSH"]:
+                    elif _logits[s, e, r] == self.config.grte_label2id["MSH"]:
                         for s_, e_, r_ in tmp:
-                            if r == r_ and _logits[s_, e_, r_] == self.config.label2id["MST"] and s_ > s and e_ == e:
+                            if r == r_ and _logits[s_, e_, r_] == self.config.grte_label2id["MST"] and s_ > s and e_ == e:
                                 spoes.add((
                                     id2predicate[r],
                                     text[mapping[s][0]: mapping[s_][1]],
@@ -177,7 +177,7 @@ def get_grte_re_model_config(predicates, **kwargs):
     model_config = {
         "num_predicates": len(predicates),
         "predicate2id": predicate2id,
-        "label2id": label2id,
+        "grte_label2id": label2id,
         "num_labels": len(tags),
         "rounds": 3,
     }

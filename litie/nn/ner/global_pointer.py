@@ -107,7 +107,7 @@ def get_auto_global_pointer_ner_model(model_type: str = "bert"):
         def decode(self, logits, masks, texts, offset_mapping):
             all_entity_list = []
             seq_lens, logits = tensor_to_cpu(masks.sum(1)), tensor_to_cpu(logits).float()
-            id2label = {int(v): k for k, v in self.config.label2id.items()}
+            id2label = {int(v): k for k, v in self.config.global_pointer_label2id.items()}
 
             decode_thresh = getattr(self.config, "decode_thresh", 0.0)
             for _logits, l, text, mapping in zip(logits, seq_lens, texts, offset_mapping):
@@ -149,7 +149,7 @@ def get_global_pointer_ner_model_config(labels: list, **kwargs):
     label2id = {v: i for i, v in enumerate(labels)}
     model_config = {
         "num_labels": len(labels),
-        "label2id": label2id,
+        "global_pointer_label2id": label2id,
         "head_size": 64,
         "use_rope": True,
         "is_sparse": False,

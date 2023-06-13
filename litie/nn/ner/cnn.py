@@ -275,7 +275,7 @@ def get_auto_cnn_ner_model(model_type: str = "bert"):
 
             decode_thresh = getattr(self.config, "decode_thresh", 0.5)
             allow_nested = getattr(self.config, "allow_nested", True)
-            id2label = {int(v): k for k, v in self.config.label2id.items()}
+            id2label = {int(v): k for k, v in self.config.cnn_label2id.items()}
 
             span_ents = self._decode(span_pred, lengths, allow_nested=allow_nested, thresh=decode_thresh)
             for span_ent, _scores, text in zip(span_ents, scores, texts):
@@ -297,7 +297,7 @@ def get_cnn_ner_model_config(labels: list, **kwargs):
     label2id = {v: i for i, v in enumerate(labels)}
     model_config = {
         "num_labels": len(labels),
-        "label2id": label2id,
+        "cnn_label2id": label2id,
         "size_embed_dim": 25,
         "biaffine_size": 200,
         "num_heads": 4,

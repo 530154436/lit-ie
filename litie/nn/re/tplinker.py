@@ -87,7 +87,7 @@ def get_auto_tplinker_re_model(model_type: str = "bert"):
             seqlens, shaking_logits = tensor_to_cpu(attention_mask.sum(1)), tensor_to_cpu(shaking_logits)
             shaking_idx2matrix_idx = [(s, e) for s in range(seq_len) for e in list(range(seq_len))[s:]]
 
-            id2label = {int(v): k for k, v in self.config.label2id.items()}
+            id2label = {int(v): k for k, v in self.config.tplinker_label2id.items()}
             for _shaking_logits, l, text, mapping in zip(shaking_logits, seqlens, texts, offset_mapping):
                 head_ind2entities = {}
                 spoes = set()
@@ -210,7 +210,7 @@ def get_tplinker_re_model_config(predicates, **kwargs):
     label2id = {t: idx for idx, t in enumerate(tags)}
 
     model_config = {
-        "num_predicates": len(predicates), "shaking_type": "cln", "label2id": label2id, "decode_thresh": 0.,
+        "num_predicates": len(predicates), "shaking_type": "cln", "tplinker_label2id": label2id, "decode_thresh": 0.,
     }
     model_config.update(kwargs)
     return model_config

@@ -94,7 +94,7 @@ def get_auto_crf_ner_model(model_type: str = "bert"):
         def decode(self, logits, mask, texts, offset_mapping):
             decode_ids = self.crf.decode(logits, mask.bool()).squeeze(0)  # (batch_size, seq_length)
             decode_ids, mask = tensor_to_cpu(decode_ids), tensor_to_cpu(mask)
-            id2label = {int(v): k for k, v in self.config.label2id.items()}
+            id2label = {int(v): k for k, v in self.config.bio_label2id.items()}
 
             decode_labels = []
             for text, ids, mask, mapping in zip(texts, decode_ids, mask, offset_mapping):
@@ -195,7 +195,7 @@ def get_auto_cascade_crf_ner_model(model_type: str = "bert"):
         def decode(self, sequence_output, logits, mask, texts, offset_mapping):
             decode_ids = self.crf.decode(logits, mask.bool()).squeeze(0)  # (batch_size, seq_length)
             BIO_MAP = getattr(self.config, 'BIO_MAP', {0: "O", 1: "B-ENT", 2: "I-ENT"})
-            id2label = {int(v): k for k, v in self.config.label2id.items()}
+            id2label = {int(v): k for k, v in self.config.bio_label2id.items()}
 
             entity_ids = []
             for ids, mask in zip(decode_ids, mask):
@@ -309,7 +309,7 @@ def get_auto_softmax_ner_model(model_type: str = "bert"):
         def decode(self, logits, mask, texts, offset_mapping):
             logits, mask = tensor_to_cpu(logits), tensor_to_cpu(mask)
             decode_ids = torch.argmax(logits, -1)  # (batch_size, seq_length)
-            id2label = {int(v): k for k, v in self.config.label2id.items()}
+            id2label = {int(v): k for k, v in self.config.bio_label2id.items()}
 
             decode_labels = []
             for text, ids, mask, mapping in zip(texts, decode_ids, mask, offset_mapping):
@@ -338,7 +338,7 @@ def get_softmax_ner_model_config(labels: list, **kwargs):
     bio_labels = ['O'] + [f"B-{l}" for l in labels] + [f"I-{l}" for l in labels]
     label2id = {v: i for i, v in enumerate(bio_labels)}
     model_config = {
-        "num_labels": len(bio_labels), "label2id": label2id,
+        "num_labels": len(bio_labels), "bio_label2id": label2id,
     }
     model_config.update(kwargs)
     return model_config
@@ -360,7 +360,7 @@ def get_cascade_crf_ner_model_config(labels: list, **kwargs):
     labels = ['O'] + labels
     label2id = {v: i for i, v in enumerate(labels)}
     model_config = {
-        "num_labels": len(labels), "label2id": label2id,
+        "num_labels": len(labels), "bio_label2id": label2id,
     }
     model_config.update(kwargs)
     return model_config

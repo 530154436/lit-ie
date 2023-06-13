@@ -87,7 +87,7 @@ def get_auto_span_ner_model(model_type: str = "bert"):
         def decode(self, start_logits, end_logits, sequence_mask, texts, offset_mapping):
             start_labels, end_labels = torch.argmax(start_logits, -1), torch.argmax(end_logits, -1)
             start_labels, end_labels = tensor_to_cpu(start_labels), tensor_to_cpu(end_labels)
-            id2label = {int(v): k for k, v in self.config.label2id.items()}
+            id2label = {int(v): k for k, v in self.config.span_label2id.items()}
 
             decode_labels = []
             seqlens = tensor_to_cpu(sequence_mask.sum(1))
@@ -128,7 +128,7 @@ def get_span_ner_model_config(labels: list, **kwargs):
     label2id = {v: i for i, v in enumerate(span_labels)}
     model_config = {
         "num_labels": len(span_labels),
-        "label2id": label2id,
+        "span_label2id": label2id,
         "loss_type": "cross_entropy",
     }
     model_config.update(kwargs)

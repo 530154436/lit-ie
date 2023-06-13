@@ -47,11 +47,11 @@ def get_auto_casrel_re_model(model_type: str = "bert"):
             self.post_init()
 
         @staticmethod
-        def gather(input, index):
+        def gather(inputs, index):
             """取出序列中某个位置的向量"""
             index = index.unsqueeze(-1).unsqueeze(-1)
-            index = index.expand(input.shape[0], 1, input.shape[2])  # [batch_size, 1, hidden_size]
-            return input.gather(1, index).squeeze(1)  # [batch_size, hidden_size]
+            index = index.expand(inputs.shape[0], 1, inputs.shape[2])  # [batch_size, 1, hidden_size]
+            return inputs.gather(1, index).squeeze(1)  # [batch_size, hidden_size]
 
         def forward(
             self,
