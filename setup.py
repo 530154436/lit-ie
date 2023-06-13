@@ -24,9 +24,9 @@ install_requires = [
 
 
 setup(
-    name="litner",
+    name="litie",
     version="0.0.1",
-    description="Pytorch-lightning Code Blocks for NER",
+    description="Pytorch-lightning Code Blocks for NER and RE",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/xusenlinzy/lit-ner",
