@@ -105,7 +105,7 @@ def get_auto_pfn_re_model(model_type: str = "bert"):
             re_tail_score = tensor_to_numpy(re_tail_score)
             masks = tensor_to_numpy(attention_mask)
 
-            batch_size = ner_score.size(0)
+            batch_size = len(ner_score)
             decode_thresh = getattr(self.config, "decode_thresh", 0.5)
             id2predicate = {int(v): k for k, v in self.config.predicate2id.items()}
 

@@ -335,7 +335,7 @@ class SetCriterion(nn.Module):
         losses = {}
         for loss in self.losses:
             if loss != "entity" or not self.empty_targets(targets):
-                losses |= self.get_loss(loss, outputs, targets, indices)
+                losses.update(self.get_loss(loss, outputs, targets, indices))
         losses = sum(losses[k] * self.loss_weight[k] for k in losses if k in self.loss_weight)
 
         return losses
