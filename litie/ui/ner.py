@@ -24,7 +24,7 @@ def extract(text, model_path, model_type, model_name, max_seq_len, device, split
     res = pipeline(text)
     running_time = time.time() - start
 
-    colors = make_color_palette(pipeline.inference_backend.model.config.label2id.keys())
+    colors = make_color_palette(pipeline.inference_backend.model.config.num_labels)
     html = visualize_ner(text, res[0], colors)
     html = (
         ""
