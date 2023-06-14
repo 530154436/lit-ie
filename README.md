@@ -19,10 +19,15 @@
 + 🙌 支持多种开源关系抽取模型
 
 
++ 👑 支持百度 [UIE](https://github.com/PaddlePaddle/PaddleNLP) 模型的训练和推理
+
+
 + 🚀 统一的训练和推理框架
 
 
 ## 📢 News 
+
++ 【2023.6.14】 新增 `UIE` 模型代码示例
 
 
 + 【2023.6.13】 增加实体抽取和关系抽取代码示例
@@ -33,10 +38,18 @@
 
 ---
 
-## 🔨 安装
+## 📦 安装
 
-```bash
-pip install litie
+### 环境依赖
+
++ python >= 3.7
+
++ torch >= 1.12
+
+### pip 安装
+
+```shell
+pip install --upgrade litie
 ```
 
 
@@ -184,7 +197,7 @@ model = AutoNerModel(model_args=model_args, training_args=training_args)
 model.finetune(data_args)
 ```
 
-训练脚本详见 [scripts](./examples/named_entity_recognition)
+训练脚本详见 [named_entity_recognition](./examples/named_entity_recognition)
 
 ### 关系抽取
 
@@ -219,7 +232,7 @@ model.finetune(data_args, num_sanity_val_steps=0)
 os.remove(os.path.join(training_args.output_dir, "best_model.ckpt"))
 ```
 
-训练脚本详见 [scripts](./examples/relation_extraction)
+训练脚本详见 [relation_extraction](./examples/relation_extraction)
 
 
 ## 📊 模型推理
@@ -264,6 +277,315 @@ from litie.ui import RelationExtractionPlayground
 
 RelationExtractionPlayground().launch()
 ```
+
+## 🍭 通用信息抽取
+
++ [UIE(Universal Information Extraction)](https://arxiv.org/pdf/2203.12277.pdf)：Yaojie Lu等人在ACL-2022中提出了通用信息抽取统一框架 `UIE`。
+
++ 该框架实现了实体抽取、关系抽取、事件抽取、情感分析等任务的统一建模，并使得不同任务间具备良好的迁移和泛化能力。
+
++ [PaddleNLP](https://github.com/PaddlePaddle/PaddleNLP)借鉴该论文的方法，基于 `ERNIE 3.0` 知识增强预训练模型，训练并开源了首个中文通用信息抽取模型 `UIE`。
+
++ 该模型可以支持不限定行业领域和抽取目标的关键信息抽取，实现零样本快速冷启动，并具备优秀的小样本微调能力，快速适配特定的抽取目标。
+
+### 模型训练
+
+模型训练脚本详见 [uie](./examples/uie)
+
+### 模型推理
+
+<details>
+<summary>👉 命名实体识别</summary>
+
+```python
+from pprint import pprint
+from litie.pipelines import UIEPipeline
+
+# 实体识别
+schema = ['时间', '选手', '赛事名称'] 
+# uie-base模型已上传至huggingface，可自动下载，其他模型只需提供模型名称将自动进行转换
+uie = UIEPipeline("xusenlin/uie-base", schema=schema)
+pprint(uie("2月8日上午北京冬奥会自由式滑雪女子大跳台决赛中中国选手谷爱凌以188.25分获得金牌！")) # Better print results using pprint
+```
+
+output: 
+
+```json
+[
+  {
+    "时间": [
+      {
+        "end": 6,
+        "probability": 0.98573786,
+        "start": 0,
+        "text": "2月8日上午"
+      }
+    ],
+    "赛事名称": [
+      {
+        "end": 23,
+        "probability": 0.8503085,
+        "start": 6,
+        "text": "北京冬奥会自由式滑雪女子大跳台决赛"
+      }
+    ],
+    "选手": [
+      {
+        "end": 31,
+        "probability": 0.8981544,
+        "start": 28,
+        "text": "谷爱凌"
+      }
+    ]
+  }
+]
+```
+</details>
+
+<details>
+<summary>👉 实体关系抽取</summary>
+
+```python
+from pprint import pprint
+from litie.pipelines import UIEPipeline
+
+# 关系抽取
+schema = {'竞赛名称': ['主办方', '承办方', '已举办次数']}
+# uie-base模型已上传至huggingface，可自动下载，其他模型只需提供模型名称将自动进行转换
+uie = UIEPipeline("xusenlin/uie-base", schema=schema)
+pprint(uie("2022语言与智能技术竞赛由中国中文信息学会和中国计算机学会联合主办，百度公司、中国中文信息学会评测工作委员会和中国计算机学会自然语言处理专委会承办，已连续举办4届，成为全球最热门的中文NLP赛事之一。")) # Better print results using pprint
+```
+
+output:
+
+```json
+[
+  {
+    "竞赛名称": [
+      {
+        "end": 13,
+        "probability": 0.78253937,
+        "relations": {
+          "主办方": [
+            {
+              "end": 22,
+              "probability": 0.8421704,
+              "start": 14,
+              "text": "中国中文信息学会"
+            },
+            {
+              "end": 30,
+              "probability": 0.75807965,
+              "start": 23,
+              "text": "中国计算机学会"
+            }
+          ],
+          "已举办次数": [
+            {
+              "end": 82,
+              "probability": 0.4671307,
+              "start": 80,
+              "text": "4届"
+            }
+          ],
+          "承办方": [
+            {
+              "end": 55,
+              "probability": 0.700049,
+              "start": 40,
+              "text": "中国中文信息学会评测工作委员会"
+            },
+            {
+              "end": 72,
+              "probability": 0.61934763,
+              "start": 56,
+              "text": "中国计算机学会自然语言处理专委会"
+            },
+            {
+              "end": 39,
+              "probability": 0.8292698,
+              "start": 35,
+              "text": "百度公司"
+            }
+          ]
+        },
+        "start": 0,
+        "text": "2022语言与智能技术竞赛"
+      }
+    ]
+  }
+]
+```
+</details>
+
+
+<details>
+<summary>👉  事件抽取</summary>
+
+```python
+from pprint import pprint
+from litie.pipelines import UIEPipeline
+
+# 事件抽取
+schema = {"地震触发词": ["地震强度", "时间", "震中位置", "震源深度"]}
+# uie-base模型已上传至huggingface，可自动下载，其他模型只需提供模型名称将自动进行转换
+uie = UIEPipeline("xusenlin/uie-base", schema=schema)
+pprint(uie("中国地震台网正式测定：5月16日06时08分在云南临沧市凤庆县(北纬24.34度，东经99.98度)发生3.5级地震，震源深度10千米。")) # Better print results using pprint
+```
+
+output:
+
+```json
+[
+  {
+    "地震触发词": [
+      {
+        "end": 58,
+        "probability": 0.99774253,
+        "relations": {
+          "地震强度": [
+            {
+              "end": 56,
+              "probability": 0.9980802,
+              "start": 52,
+              "text": "3.5级"
+            }
+          ],
+          "时间": [
+            {
+              "end": 22,
+              "probability": 0.98533,
+              "start": 11,
+              "text": "5月16日06时08分"
+            }
+          ],
+          "震中位置": [
+            {
+              "end": 50,
+              "probability": 0.7874015,
+              "start": 23,
+              "text": "云南临沧市凤庆县(北纬24.34度，东经99.98度)"
+            }
+          ],
+          "震源深度": [
+            {
+              "end": 67,
+              "probability": 0.9937973,
+              "start": 63,
+              "text": "10千米"
+            }
+          ]
+        },
+        "start": 56,
+        "text": "地震"
+      }
+    ]
+  }
+]
+```
+</details>
+
+<details>
+<summary>👉 评论观点抽取</summary>
+
+```python
+from pprint import pprint
+from litie.pipelines import UIEPipeline
+
+# 评论观点抽取
+schema = {'评价维度': ['观点词', '情感倾向[正向，负向]']}
+# uie-base模型已上传至huggingface，可自动下载，其他模型只需提供模型名称将自动进行转换
+uie = UIEPipeline("xusenlin/uie-base", schema=schema)
+pprint(uie("店面干净，很清静，服务员服务热情，性价比很高，发现收银台有排队")) # Better print results using pprint
+```
+
+output:
+
+```json
+[
+  {
+    "评价维度": [
+      {
+        "end": 20,
+        "probability": 0.98170394,
+        "relations": {
+          "情感倾向[正向，负向]": [
+            {
+              "probability": 0.9966142773628235,
+              "text": "正向"
+            }
+          ],
+          "观点词": [
+            {
+              "end": 22,
+              "probability": 0.95739645,
+              "start": 21,
+              "text": "高"
+            }
+          ]
+        },
+        "start": 17,
+        "text": "性价比"
+      },
+      {
+        "end": 2,
+        "probability": 0.9696847,
+        "relations": {
+          "情感倾向[正向，负向]": [
+            {
+              "probability": 0.9982153177261353,
+              "text": "正向"
+            }
+          ],
+          "观点词": [
+            {
+              "end": 4,
+              "probability": 0.9945317,
+              "start": 2,
+              "text": "干净"
+            }
+          ]
+        },
+        "start": 0,
+        "text": "店面"
+      }
+    ]
+  }
+]
+```
+</details>
+
+
+<details>
+<summary>👉 情感分类</summary>
+
+
+```python
+from pprint import pprint
+from litie.pipelines import UIEPipeline
+
+# 事件抽取
+schema = '情感倾向[正向，负向]'
+# uie-base模型已上传至huggingface，可自动下载，其他模型只需提供模型名称将自动进行转换
+uie = UIEPipeline("xusenlin/uie-base", schema=schema)
+pprint(uie("这个产品用起来真的很流畅，我非常喜欢")) # Better print results using pprint
+```
+
+output:
+
+```json
+[
+  {
+    "情感倾向[正向，负向]": [
+      {
+        "probability": 0.9990023970603943,
+        "text": "正向"
+      }
+    ]
+  }
+]
+```
+</details>
 
 
 ## 📜 License

@@ -98,10 +98,12 @@ class UIEPipeline(object):
                 input_path = self._model_name_or_path
                 self._model_name_or_path = self._model_name_or_path.replace('-', '_') + '_pytorch'
                 if not os.path.exists(self._model_name_or_path):
+                    import shutil
                     from ..nn.uie.convert import check_model, extract_and_convert
 
                     check_model(input_path)
                     extract_and_convert(input_path, self._model_name_or_path)
+                    shutil.rmtree(input_path)  # delete paddlepaddle model weights
 
         self._tokenizer = BertTokenizerFast.from_pretrained(self._model_name_or_path)
 
