@@ -1,4 +1,4 @@
-# Lit-NER
+# Lit-IE
 
 <p align="center">
     <a href="https://github.com/xusenlinzy/lit-ner"><img src="https://img.shields.io/github/license/xusenlinzy/lit-ner"></a>

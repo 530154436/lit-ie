@@ -1,5 +1,5 @@
 export TASK_NAME=uie
-export MODEL_NAME_OR_PATH=uie_base_pytorch
+export MODEL_NAME_OR_PATH=xusenlin/uie-base
 export OUTPUT_DIR=outputs
 export DATA_DIR=datasets/12315
 
