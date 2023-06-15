@@ -29,7 +29,12 @@ class ReEngine(TaskEngine):
         return AutoReTaskModelConfig.create(task_model_name, labels, **kwargs)
 
     def get_auto_model(self, model_type, task_model_name):
-        return AutoReTaskModel.create(task_model_name, model_type)
+        return AutoReTaskModel.create(
+            task_model_name,
+            model_type,
+            base_model=self.base_model_class,
+            parent_model=self.parent_model_class,
+        )
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         outputs = self.model(**batch)

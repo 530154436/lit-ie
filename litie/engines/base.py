@@ -8,7 +8,6 @@ from transformers import AutoConfig, PreTrainedTokenizerBase, get_scheduler, Ada
 from transformers import PretrainedConfig, PreTrainedModel, Pipeline
 from transformers import pipeline as hf_transformers_pipeline
 
-from ..nn.model_utils import MODEL_MAP
 from ..utils.deepspeed import enable_transformers_pretrained_deepspeed_sharding
 from ..utils.imports import ACCELERATE_AVAILABLE
 
@@ -36,6 +35,8 @@ class TaskEngine(pl.LightningModule):
         deepspeed_sharding: bool = False,
         optimizer: Optional[torch.optim.Optimizer] = None,
         scheduler: Optional[Any] = None,
+        base_model_class: Optional[PreTrainedModel] = None,
+        parent_model_class: Optional[PreTrainedModel] = None,
         training_args: Optional[Any] = None,
     ) -> None:
         super().__init__()
@@ -59,10 +60,12 @@ class TaskEngine(pl.LightningModule):
         self._pipeline_kwargs = pipeline_kwargs or {}
         self.training_args = training_args if training_args else TrainingArguments
 
+        self.base_model_class = base_model_class
+        self.parent_model_class = parent_model_class
+
         logger.debug(f"Training parameters: {self.training_args}")
 
         # optimizer kwargs
-        self.backbone = MODEL_MAP[model_type][-1] if model_type in MODEL_MAP else None
         self.deepspeed_sharding = deepspeed_sharding
         if not self.deepspeed_sharding:
             self.initialize_model(self.pretrained_model_name_or_path, config, model)
@@ -146,14 +149,14 @@ class TaskEngine(pl.LightningModule):
 
         return self.optimizer
 
-    def create_model_param_optimizer(self, model: torch.nn.Module):
+    def create_model_param_optimizer(self, model: PreTrainedModel):
         """different learning rate for different modules
         """
         no_decay = ["bias", 'LayerNorm.weight']
         optimizer_grouped_parameters = []
 
-        if hasattr(model, self.backbone) and float(self.training_args.other_learning_rate) != 0.0:
-            base_model = getattr(model, self.backbone)
+        if float(self.training_args.other_learning_rate) != 0.0:
+            base_model = getattr(model, model.base_model_prefix)
             base_model_param = list(base_model.named_parameters())
 
             base_model_param_ids = [id(p) for n, p in base_model_param]

@@ -2,7 +2,7 @@ from typing import Optional, Any, Union, List, Dict
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
-from transformers import PreTrainedTokenizerBase, BertTokenizerFast
+from transformers import PreTrainedTokenizerBase, BertTokenizerFast, PreTrainedModel
 
 from ..arguments import TrainingArguments, DataTrainingArguments, ModelArguments
 from ..callbacks import LoggingCallback
@@ -23,6 +23,8 @@ class BaseModel:
         model_config_kwargs: Optional[dict] = None,
         model_args: Optional[ModelArguments] = None,
         training_args: Optional[Any] = None,
+        base_model_class: Optional[PreTrainedModel] = None,
+        parent_model_class: Optional[PreTrainedModel] = None,
     ):
         self.task_model_name = task_model_name if task_model_name else model_args.task_name
         self.model_type = model_type if model_type else model_args.model_type
@@ -32,6 +34,9 @@ class BaseModel:
 
         self.model_args = model_args
         self.training_args = training_args if training_args else TrainingArguments
+
+        self.base_model_class = base_model_class
+        self.parent_model_class = parent_model_class
 
     def create_engine(self):
         raise NotImplementedError

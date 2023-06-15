@@ -30,8 +30,8 @@ class AutoNerTaskModel(BaseParent):
     registry = {}
 
     @classmethod
-    def create(cls, class_key, model_type="bert"):
-        return cls.registry[class_key](model_type)
+    def create(cls, class_key, model_type="bert", **kwargs):
+        return cls.registry[class_key](model_type, **kwargs)
 
 
 AutoNerTaskModelConfig.add_to_registry("crf", get_crf_ner_model_config)

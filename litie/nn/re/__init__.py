@@ -22,8 +22,8 @@ class AutoReTaskModel(BaseParent):
     registry = {}
 
     @classmethod
-    def create(cls, class_key, model_type="bert"):
-        return cls.registry[class_key](model_type)
+    def create(cls, class_key, model_type="bert", **kwargs):
+        return cls.registry[class_key](model_type, **kwargs)
 
 
 AutoReTaskModelConfig.add_to_registry("casrel", get_casrel_re_model_config)

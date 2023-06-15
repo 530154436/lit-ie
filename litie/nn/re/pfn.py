@@ -4,15 +4,20 @@ from typing import Optional, List, Any
 import numpy as np
 import torch
 import torch.nn as nn
+from transformers import PreTrainedModel
 
 from ..model_utils import RelationExtractionOutput, MODEL_MAP
 from ...datasets.utils import tensor_to_numpy
 from ...layers.pfn import PfnEncoder, NerUnit, ReUnit
 
 
-def get_auto_pfn_re_model(model_type: str = "bert"):
-
-    base_model, parent_model, base_model_name = MODEL_MAP[model_type]
+def get_auto_pfn_re_model(
+    model_type: Optional[str] = "bert",
+    base_model: Optional[PreTrainedModel] = None,
+    parent_model: Optional[PreTrainedModel] = None,
+):
+    if base_model is None and parent_model is None:
+        base_model, parent_model = MODEL_MAP[model_type]
 
     class PFN(parent_model):
         """
@@ -31,7 +36,7 @@ def get_auto_pfn_re_model(model_type: str = "bert"):
         def __init__(self, config):
             super().__init__(config)
             self.config = config
-            setattr(self, base_model_name, base_model(config, add_pooling_layer=False))
+            setattr(self, self.base_model_prefix, base_model(config, add_pooling_layer=False))
 
             classifier_dropout = (
                 config.classifier_dropout if config.classifier_dropout is not None else config.hidden_dropout_prob
@@ -63,7 +68,7 @@ def get_auto_pfn_re_model(model_type: str = "bert"):
             target: Optional[List[Any]] = None,
         ) -> RelationExtractionOutput:
 
-            outputs = getattr(self, base_model_name)(
+            outputs = getattr(self, self.base_model_prefix)(
                 input_ids,
                 attention_mask=attention_mask,
                 token_type_ids=token_type_ids,

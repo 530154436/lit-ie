@@ -25,7 +25,7 @@ def get_auto_span_ner_model(model_type: str = "bert"):
         def __init__(self, config):
             super().__init__(config)
             self.config = config
-            setattr(self, base_model_name, base_model(config, add_pooling_layer=False))
+            setattr(self, self.base_model_prefix, base_model(config, add_pooling_layer=False))
 
             classifier_dropout = (
                 config.classifier_dropout if config.classifier_dropout is not None else config.hidden_dropout_prob
@@ -52,7 +52,7 @@ def get_auto_span_ner_model(model_type: str = "bert"):
             return_decoded_labels: Optional[bool] = True,
         ) -> SpanOutput:
 
-            outputs = getattr(self, base_model_name)(
+            outputs = getattr(self, self.base_model_prefix)(
                 input_ids,
                 attention_mask=attention_mask,
                 token_type_ids=token_type_ids,

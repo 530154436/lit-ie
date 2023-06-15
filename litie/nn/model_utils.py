@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Optional, List, Any, Tuple
 
@@ -12,25 +13,29 @@ from transformers.file_utils import ModelOutput
 from .chinese_bert import ChineseBertModel, ChineseBertTokenizerFast
 from .roformer import RoFormerModel, RoFormerPreTrainedModel
 
-MODEL_MAP = {
-    "bert": (BertModel, BertPreTrainedModel, "bert"),
-    "ernie": (ErnieModel, ErniePreTrainedModel, "ernie"),
-    "roformer": (RoFormerModel, RoFormerPreTrainedModel, "roformer"),
-    "nezha": (NezhaModel, NezhaPreTrainedModel, "nezha"),
-    "albert": (AlbertModel, AlbertPreTrainedModel, "albert"),
-    "xlnet": (XLNetModel, XLNetPreTrainedModel, "transformer"),
-    "chinese_bert": (ChineseBertModel, BertPreTrainedModel, "bert"),
-}
+MODEL_MAP = OrderedDict(
+    {
+        "bert": (BertModel, BertPreTrainedModel),
+        "ernie": (ErnieModel, ErniePreTrainedModel),
+        "roformer": (RoFormerModel, RoFormerPreTrainedModel),
+        "nezha": (NezhaModel, NezhaPreTrainedModel),
+        "albert": (AlbertModel, AlbertPreTrainedModel),
+        "xlnet": (XLNetModel, XLNetPreTrainedModel),
+        "chinese-bert": (ChineseBertModel, BertPreTrainedModel),
+    }
+)
 
-TOKENIZER_MAP = {
-    "bert": BertTokenizerFast,
-    "ernie": BertTokenizerFast,
-    "roformer": BertTokenizerFast,
-    "nezha": BertTokenizerFast,
-    "albert": AlbertTokenizer,
-    "xlnet": XLNetTokenizer,
-    "chinese_bert": ChineseBertTokenizerFast,
-}
+TOKENIZER_MAP = OrderedDict(
+    {
+        "bert": BertTokenizerFast,
+        "ernie": BertTokenizerFast,
+        "roformer": BertTokenizerFast,
+        "nezha": BertTokenizerFast,
+        "albert": AlbertTokenizer,
+        "xlnet": XLNetTokenizer,
+        "chinese-bert": ChineseBertTokenizerFast,
+    }
+)
 
 
 @dataclass

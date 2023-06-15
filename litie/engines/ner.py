@@ -29,7 +29,12 @@ class NerEngine(TaskEngine):
         return AutoNerTaskModelConfig.create(task_model_name, labels, **kwargs)
 
     def get_auto_model(self, model_type, task_model_name):
-        return AutoNerTaskModel.create(task_model_name, model_type)
+        return AutoNerTaskModel.create(
+            task_model_name,
+            model_type,
+            base_model=self.base_model_class,
+            parent_model=self.parent_model_class,
+        )
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         outputs = self.model(**batch)

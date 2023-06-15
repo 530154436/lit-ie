@@ -3,6 +3,7 @@ from typing import Optional, List, Any
 import torch
 import torch.nn.functional as F
 from torch import nn
+from transformers import PreTrainedModel
 
 from ..decode_utils import filter_clashed_by_priority
 from ..model_utils import SequenceLabelingOutput, MODEL_MAP
@@ -95,9 +96,13 @@ class MultiHeadBiaffine(nn.Module):
         return w.reshape(bsz, self.out_size, max_len, max_len)
 
 
-def get_auto_cnn_ner_model(model_type: str = "bert"):
-
-    base_model, parent_model, base_model_name = MODEL_MAP[model_type]
+def get_auto_cnn_ner_model(
+    model_type: Optional[str] = "bert",
+    base_model: Optional[PreTrainedModel] = None,
+    parent_model: Optional[PreTrainedModel] = None,
+):
+    if base_model is None and parent_model is None:
+        base_model, parent_model = MODEL_MAP[model_type]
 
     class CnnForNer(parent_model):
         """
@@ -114,7 +119,7 @@ def get_auto_cnn_ner_model(model_type: str = "bert"):
         def __init__(self, config):
             super().__init__(config)
             self.config = config
-            setattr(self, base_model_name, base_model(config, add_pooling_layer=False))
+            setattr(self, self.base_model_prefix, base_model(config, add_pooling_layer=False))
 
             self.dropout = nn.Dropout(0.4)
 
@@ -174,7 +179,7 @@ def get_auto_cnn_ner_model(model_type: str = "bert"):
             return_decoded_labels: Optional[bool] = True,
         ) -> SequenceLabelingOutput:
 
-            outputs = getattr(self, base_model_name)(
+            outputs = getattr(self, self.base_model_prefix)(
                 input_ids,
             )
 

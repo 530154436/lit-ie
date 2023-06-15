@@ -19,6 +19,8 @@ class AutoRelationExtractionModel(BaseModel):
             labels=self.data_module.schemas,
             model_config_kwargs=self.model_config_kwargs or {},
             training_args=self.training_args,
+            base_model_class=self.base_model_class,
+            parent_model_class=self.parent_model_class,
         )
 
     def create_data_module(
