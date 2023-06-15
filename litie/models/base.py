@@ -58,7 +58,7 @@ class BaseModel:
         data_args: DataTrainingArguments,
         is_chinese: Optional[bool] = False,
         cache_dir: Optional[str] = None,
-        labels: Optional[Union[Dict[str, int], List[Any]]] = None,
+        labels: Optional[Union[Dict[str, Any], List[Any]]] = None,
         **trainer_kwargs,
     ):
         if self.tokenizer is None and self.model_name_or_path is not None:
