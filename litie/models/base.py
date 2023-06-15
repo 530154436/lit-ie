@@ -6,8 +6,11 @@ from transformers import PreTrainedTokenizerBase, BertTokenizerFast, PreTrainedM
 
 from ..arguments import TrainingArguments, DataTrainingArguments, ModelArguments
 from ..callbacks import LoggingCallback
+from ..datasets.base import TaskDataModule
+from ..engines import TaskEngine
 from ..nn.model_utils import TOKENIZER_MAP
 from ..utils.imports import WANDB_AVAILABLE
+from ..utils.logger import logger
 
 
 class BaseModel:
@@ -38,7 +41,7 @@ class BaseModel:
         self.base_model_class = base_model_class
         self.parent_model_class = parent_model_class
 
-    def create_engine(self):
+    def create_engine(self) -> TaskEngine:
         raise NotImplementedError
 
     def create_data_module(
@@ -47,7 +50,7 @@ class BaseModel:
         is_chinese: Optional[bool] = False,
         cache_dir: Optional[str] = None,
         labels: Optional[Union[Dict[str, int], List[Any]]] = None,
-    ):
+    ) -> TaskDataModule:
         raise NotImplementedError
 
     def finetune(
@@ -65,6 +68,12 @@ class BaseModel:
         self.data_module = self.create_data_module(data_args, is_chinese, cache_dir, labels=labels)
         self.engine = self.create_engine()
         trainer = self.make_trainer(**trainer_kwargs)
+
+        logger.info("***** Running training *****")
+        logger.info(f"  Num Epochs = {trainer.max_epochs:,}")
+        logger.info(f"  Instantaneous batch size per device = {self.training_args.per_device_train_batch_size:,}")
+        logger.info(f"  Gradient Accumulation steps = {trainer.accumulate_grad_batches}")
+        logger.info(f"  Total optimization steps = {trainer.estimated_stepping_batches:,}")
 
         trainer.fit(self.engine, self.data_module)
 

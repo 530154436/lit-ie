@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 from typing import IO, Any, Callable, Dict, Optional, Tuple, Union
 
@@ -8,6 +9,7 @@ from transformers import AutoConfig, PreTrainedTokenizerBase, get_scheduler, Ada
 from transformers import PretrainedConfig, PreTrainedModel, Pipeline
 from transformers import pipeline as hf_transformers_pipeline
 
+from ..callbacks import AdversarialMethods
 from ..utils.deepspeed import enable_transformers_pretrained_deepspeed_sharding
 from ..utils.imports import ACCELERATE_AVAILABLE
 
@@ -16,6 +18,13 @@ if ACCELERATE_AVAILABLE:
 
 from ..arguments import TrainingArguments
 from ..utils.logger import logger
+
+
+def verify_manual_optimization_support(trainer: "pl.Trainer", model: "pl.LightningModule") -> None:
+    if model.automatic_optimization:
+        return
+    trainer.gradient_clip_val = None
+    trainer.accumulate_grad_batches = 1
 
 
 class TaskEngine(pl.LightningModule):
@@ -69,6 +78,20 @@ class TaskEngine(pl.LightningModule):
         self.deepspeed_sharding = deepspeed_sharding
         if not self.deepspeed_sharding:
             self.initialize_model(self.pretrained_model_name_or_path, config, model)
+
+        # adversarial parameters
+        if self.training_args.do_adv:
+            self.adversarial = AdversarialMethods[self.training_args.adv_mode](
+                model=self.model,
+                emb_name=self.training_args.adv_embedding_name,
+            )
+
+            self.automatic_optimization = False
+            k = "pytorch_lightning.trainer.configuration_validator"
+            if k in sys.modules:
+                setattr(sys.modules[k], '__verify_manual_optimization_support', verify_manual_optimization_support)
+
+            self.training_step = self.adversarial_step
 
     def initialize_model(self, pretrained_model_name_or_path: str, config: PretrainedConfig, model: PreTrainedModel):
         """create and initialize the model to use with this task,
@@ -298,6 +321,54 @@ class TaskEngine(pl.LightningModule):
         save_path = output_dir.joinpath(f"{self.model_type}-{self.task_model_name}")
         self.model.save_pretrained(save_path)
         self.tokenizer.save_pretrained(save_path)
+
+    def training_step(self, batch: Any, **kwargs: Any) -> torch.Tensor:
+        outputs = self.model(**batch)
+        loss = outputs[0]
+        self.log("train_loss", loss)
+        return loss
+
+    def adversarial_step(self, batch: Any, **kwargs: Any) -> torch.Tensor:
+        opt = self.optimizers()
+        scheduler = self.lr_schedulers()
+        opt.zero_grad()
+
+        loss = None
+        if self.training_args.adv_mode == "fgm":
+            loss = self.model(**batch)[0]
+            self.manual_backward(loss)
+
+            self.adversarial.attack(epsilon=self.training_args.adv_epsilon)
+            loss = self.model(**batch)[0]
+            self.manual_backward(loss)
+
+        elif self.training_args.adv_mode == "pgd":
+            loss = self.model(**batch)[0]
+            self.manual_backward(loss)
+            self.adversarial.backup_grad()
+            for t in range(self.training_args.num_adv_attacks):
+                self.adversarial.attack(
+                    is_first_attack=(t == 0),
+                    alpha=self.training_args.adv_alpha,
+                    epsilon=self.training_args.adv_epsilon,
+                )
+                if t != self.training_args.num_adv_attacks - 1:
+                    opt.zero_grad()
+                else:
+                    self.adversarial.restore_grad()
+                loss = self.model(**batch)[0]
+                self.manual_backward(loss)
+
+        self.adversarial.restore()
+
+        if self.training_args.max_grad_norm is not None:
+            self.clip_gradients(opt, gradient_clip_val=self.training_args.max_grad_norm)
+
+        opt.step()
+        scheduler and scheduler.step()
+        self.model.zero_grad()
+
+        return loss
 
     def get_auto_model(self, model_type, task_model_name):
         return None

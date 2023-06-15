@@ -13,12 +13,6 @@ class UieEngine(TaskEngine):
     def get_auto_model(self, downstream_model_type, downstream_model_name):
         return UIEModel
 
-    def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
-        outputs = self.model(**batch)
-        loss = outputs[0]
-        self.log("train_loss", loss)
-        return loss
-
     def common_step(self, batch: Any):
         outputs = self.model(**batch)
         start_prob = tensor_to_numpy(outputs.start_prob)

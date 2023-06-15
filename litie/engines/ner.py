@@ -36,12 +36,6 @@ class NerEngine(TaskEngine):
             parent_model=self.parent_model_class,
         )
 
-    def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
-        outputs = self.model(**batch)
-        loss = outputs[0]
-        self.log("train_loss", loss)
-        return loss
-
     def common_step(self, batch: Any) -> None:
         outputs = self.model(**batch)
         preds, labels = outputs["predictions"], outputs["groundtruths"]

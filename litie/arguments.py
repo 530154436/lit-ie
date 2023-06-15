@@ -10,18 +10,35 @@ class DataTrainingArguments:
     Arguments pertaining to what data we are going to input our gpt2-chinese for training and eval.
     """
     dataset_name: Optional[str] = field(
-        default=None, metadata={"help": "The name of the dataset to use (via the datasets library)."}
+        default=None,
+        metadata={
+            "help": "The name of the dataset to use (via the datasets library)."
+        }
     )
     dataset_config_name: Optional[str] = field(
-        default=None, metadata={"help": "The configuration name of the dataset to use (via the datasets library)."}
+        default=None,
+        metadata={
+            "help": "The configuration name of the dataset to use (via the datasets library)."
+        }
     )
     train_file: Optional[str] = field(
-        default=None, metadata={"help": "A csv or a json file containing the training data."}
+        default=None,
+        metadata={
+            "help": "A csv or a json file containing the training data."
+        }
     )
     validation_file: Optional[str] = field(
-        default=None, metadata={"help": "A csv or a json file containing the validation data."}
+        default=None,
+        metadata={
+            "help": "A csv or a json file containing the validation data."
+        }
     )
-    test_file: Optional[str] = field(default=None, metadata={"help": "A csv or a json file containing the test data."})
+    test_file: Optional[str] = field(
+        default=None,
+        metadata={
+            "help": "A csv or a json file containing the test data."
+        }
+    )
     train_max_length: int = field(
         default=256,
         metadata={
@@ -59,13 +76,22 @@ class DataTrainingArguments:
         },
     )
     streaming: bool = field(
-        default=False, metadata={"help": "Enable streaming mode."}
+        default=False,
+        metadata={
+            "help": "Enable streaming mode."
+        }
     )
     is_chinese: bool = field(
-        default=True, metadata={"help": "Whether the language is Chinese."}
+        default=True,
+        metadata={
+            "help": "Whether the language is Chinese."
+        }
     )
     overwrite_cache: bool = field(
-        default=False, metadata={"help": "Overwrite the cached training and evaluation sets"}
+        default=False,
+        metadata={
+            "help": "Overwrite the cached training and evaluation sets"
+        }
     )
     validation_split_percentage: Optional[int] = field(
         default=None,
@@ -75,7 +101,9 @@ class DataTrainingArguments:
     )
     preprocessing_num_workers: Optional[int] = field(
         default=None,
-        metadata={"help": "The number of processes to use for the preprocessing."},
+        metadata={
+            "help": "The number of processes to use for the preprocessing."
+        },
     )
 
     def __post_init__(self):
@@ -118,7 +146,9 @@ class ModelArguments:
     )
     cache_dir: Optional[str] = field(
         default=None,
-        metadata={"help": "Where do you want to store the pretrained models downloaded from huggingface.co"},
+        metadata={
+            "help": "Where do you want to store the pretrained models downloaded from huggingface.co"
+        },
     )
 
 
@@ -233,4 +263,40 @@ class TrainingArguments:
             "help": (
                 "The output directory where the model predictions and checkpoints will be written.")
         },
+    )
+    do_adv: bool = field(
+        default=False,
+        metadata={
+            "help": "Whether to run adversarial training."
+        }
+    )
+    adv_mode: str = field(
+        default="fgm",
+        metadata={
+            "help": "Adversarial training method."
+        }
+    )
+    adv_embedding_name: str = field(
+        default="word_embeddings",
+        metadata={
+            "help": "Adversarial training embedding name."
+        }
+    )
+    adv_epsilon: float = field(
+        default=1.,
+        metadata={
+            "help": "Adversarial training epsilon."
+        }
+    )
+    adv_alpha: float = field(
+        default=0.3,
+        metadata={
+            "help": "Adversarial training alpha."
+        }
+    )
+    num_adv_attacks: int = field(
+        default=3,
+        metadata={
+            "help": "Adversarial training nums of attacks."
+        }
     )

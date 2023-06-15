@@ -19,8 +19,6 @@ def get_auto_global_pointer_ner_model(
     if base_model is None and parent_model is None:
         base_model, parent_model = MODEL_MAP[model_type]
 
-    base_model, parent_model, base_model_name = MODEL_MAP[model_type]
-
     class GlobalPointerForNer(parent_model):
         """
         基于`BERT`的`GlobalPointer`实体识别模型
