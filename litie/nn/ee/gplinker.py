@@ -70,16 +70,16 @@ def get_auto_gplinker_ee_model(
 
             self.hidden_size = config.hidden_size
             # 实体首尾对应，需要相对位置编码且保证首不超过尾
-            self.entity_tagger = EfficientGlobalPointer(config.hidden_size, 2, config.head_size)
+            self.argu_tagger = EfficientGlobalPointer(config.hidden_size, config.num_predicates, config.head_size)
             self.head_tagger = EfficientGlobalPointer(
                 config.hidden_size,
-                config.num_predicates,
+                1,
                 config.head_size,
                 use_rope=False,
             )
             self.tail_tagger = EfficientGlobalPointer(
                 config.hidden_size,
-                config.num_predicates,
+                1,
                 config.head_size,
                 use_rope=False,
             )
@@ -94,7 +94,7 @@ def get_auto_gplinker_ee_model(
             input_ids: Optional[torch.Tensor] = None,
             attention_mask: Optional[torch.Tensor] = None,
             token_type_ids: Optional[torch.Tensor] = None,
-            entity_labels: Optional[torch.Tensor] = None,
+            argu_labels: Optional[torch.Tensor] = None,
             head_labels: Optional[torch.Tensor] = None,
             tail_labels: Optional[torch.Tensor] = None,
             texts: Optional[List[str]] = None,
@@ -110,22 +110,22 @@ def get_auto_gplinker_ee_model(
             sequence_output = self.dropout(outputs[0])  # [batch_size, seq_len, hidden_size]
 
             # [batch_size, 2, seq_len, seq_len]
-            entity_logits = self.entity_tagger(sequence_output, mask=attention_mask)
+            argu_logits = self.argu_tagger(sequence_output, mask=attention_mask)
             # [batch_size, num_predicates, seq_len, seq_len]
             head_logits = self.head_tagger(sequence_output, mask=attention_mask)
             # [batch_size, num_predicates, seq_len, seq_len]
             tail_logits = self.tail_tagger(sequence_output, mask=attention_mask)
 
             loss, predictions = None, None
-            if entity_labels is not None and head_labels is not None and tail_labels is not None:
-                entity_loss = self.compute_loss([entity_logits, entity_labels])
+            if argu_labels is not None and head_labels is not None and tail_labels is not None:
+                entity_loss = self.compute_loss([argu_logits, argu_labels])
                 head_loss = self.compute_loss([head_logits, head_labels])
                 tail_loss = self.compute_loss([tail_logits, tail_labels])
                 loss = (entity_loss + head_loss + tail_loss) / 3
 
             if not self.training:
                 predictions = self.decode(
-                    entity_logits, head_logits, tail_logits, attention_mask, texts, offset_mapping)
+                    argu_logits, head_logits, tail_logits, attention_mask, texts, offset_mapping)
 
             return RelationExtractionOutput(
                 loss=loss,
@@ -136,12 +136,12 @@ def get_auto_gplinker_ee_model(
                 attentions=outputs.attentions,
             )
 
-        def decode(self, entity_logits, head_logits, tail_logits, masks, texts, offset_mapping):
+        def decode(self, argu_logits, head_logits, tail_logits, masks, texts, offset_mapping):
             all_event_list = []
-            batch_size = entity_logits.shape[0]
+            batch_size = argu_logits.shape[0]
             masks = tensor_to_numpy(masks)
 
-            entity_logits = tensor_to_numpy(entity_logits)
+            entity_logits = tensor_to_numpy(argu_logits)
             head_logits = tensor_to_numpy(head_logits)
             tail_logits = tensor_to_numpy(tail_logits)
             decode_thresh = getattr(self.config, "decode_thresh", 0.0)

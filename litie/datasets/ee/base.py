@@ -34,10 +34,39 @@ class EventExtractionDataModule(TaskDataModule):
             max_length=max_length,
             text_column_name=text_column_name,
             label_column_name=label_column_name,
+            predicate2id=self.predicate_to_id,
             mode=mode,
             is_chinese=self.is_chinese,
         )
         return convert_to_features
+
+    @staticmethod
+    def duee_v1_process(example):
+        events = []
+        for e in example["event_list"]:
+            offset1 = len(e["trigger"]) - len(e["trigger"].lstrip())
+            events.append(
+                [
+                    [
+                        e["event_type"] + "@" + "触发词",
+                        e["trigger"],
+                        e["trigger_start_index"] + offset1,
+                        e["trigger_start_index"] + offset1 + len(e["trigger"].strip()),
+                    ]
+                ]
+            )
+            for a in e["arguments"]:
+                offset2 = len(a["argument"]) - len(a["argument"].lstrip())
+                events[-1].append(
+                    [
+                        e["event_type"] + "@" + a["role"],
+                        a["argument"],
+                        a["argument_start_index"] + offset2,
+                        a["argument_start_index"] + offset2 + len(a["argument"].strip()),
+                    ]
+                )
+        del example["event_list"]
+        return {"target": events}
 
     def process_data(self, dataset: Union[Dataset, Dict], stage: Optional[str] = None) -> Union[Dataset, Dict]:
         label_column_name, text_column_name = self._setup_input_fields(dataset, stage)
@@ -46,7 +75,9 @@ class EventExtractionDataModule(TaskDataModule):
         convert_to_features_train = self.get_process_fct(text_column_name, label_column_name, "train")
         convert_to_features_val = self.get_process_fct(text_column_name, label_column_name, "val")
 
-        train_dataset = self.process_train(dataset["train"], predicate2id=self.predicate_to_id)
+        train_dataset = dataset["train"].map(self.duee_v1_process)
+        val_dataset = dataset["validation"].map(self.duee_v1_process)
+
         train_dataset = train_dataset.map(
             convert_to_features_train,
             batched=True,
@@ -56,24 +87,6 @@ class EventExtractionDataModule(TaskDataModule):
             num_proc=self.num_workers,
         )
 
-        def process_dev(example):
-            events_label = []
-            event_list = example.get("event_list", None)
-            if event_list is not None:
-                for e in event_list:
-                    etype = e["event_type"]
-                    role = "触发词"
-                    argument = e["trigger"]
-                    event = [(etype + "+" + role, argument)]
-
-                    for a in e["arguments"]:
-                        role = a["role"]
-                        argument = a["argument"]
-                        event.append((etype + "+" + role, argument))
-                    events_label.append(event)
-            return {"text": example["text"], "target": events_label}
-
-        val_dataset = dataset["validation"].map(process_dev)
         val_dataset = val_dataset.map(
             convert_to_features_val,
             batched=True,
@@ -97,39 +110,17 @@ class EventExtractionDataModule(TaskDataModule):
 
         all_dataset = {"train": train_dataset, "validation": val_dataset}
 
-        if "test" in dataset:
-            test_dataset = dataset["test"].map(process_dev)
-            convert_to_features_test = self.get_process_fct(text_column_name, label_column_name, "test")
-            test_dataset = test_dataset.map(
-                convert_to_features_test,
-                batched=True,
-                remove_columns=[label_column_name],
-                desc="Running tokenizer on test datasets",
-                new_fingerprint=f"test-{self.test_max_length}-{self.task_name}",
-                num_proc=self.num_workers,
-            )
-
-            all_dataset["test"] = test_dataset
-
         return all_dataset
 
     def _setup_input_fields(self, dataset, stage):
         split = "train" if stage == "fit" else "validation"
         column_names = dataset[split].column_names
         text_column_name = "text" if "text" in column_names else column_names[0]
-        label_column_name = "event_list" if "event_list" in column_names else column_names[1]
+        label_column_name = "target" if "target" in column_names else column_names[1]
         return label_column_name, text_column_name
 
-    def _prepare_labels(self, dataset, label_column_name):
-        if self.labels is None:
-            # Create unique label set from train datasets.
-            labels = []
-            for line in dataset["train"]:
-                roles = ["触发词"] + [o["role"] for o in line["role_list"]]
-                labels.extend([line["event_type"] + "+" + role for role in roles])
-            self.labels = list(set(labels))
-
-        self.labels = sorted(self.labels)
+    def _prepare_labels(self):
+        self.labels = sorted(list(set(self.labels)))
         self.predicate_to_id = {l: i for i, l in enumerate(self.labels)}
 
     @property
@@ -139,28 +130,6 @@ class EventExtractionDataModule(TaskDataModule):
             self.setup("fit")
         return self.labels
 
-    def process_train(self, ds, predicate2id):
-        def convert(example):
-            events_label = []
-            event_list = example.get("event_list", None)
-            if event_list is not None:
-                for e in event_list:
-                    etype = e["event_type"]
-                    role = "触发词"
-                    argument = e["trigger"]
-                    index = e["trigger_start_index"]
-                    event = [(predicate2id[etype + "+" + role], index, index + len(argument) - 1)]
-
-                    for a in e["arguments"]:
-                        role = a["role"]
-                        argument = a["argument"]
-                        index = a["argument_start_index"]
-                        event.append((predicate2id[etype + "+" + role], index, index + len(argument) - 1))
-                    events_label.append(event)
-            return {"text": example["text"], "event_list": events_label}
-
-        return ds.map(convert)
-
     @staticmethod
     def convert_to_features(
         examples: Any,
@@ -168,6 +137,7 @@ class EventExtractionDataModule(TaskDataModule):
         max_length: int,
         text_column_name: str,
         label_column_name: str,
+        predicate2id: Dict[str, Any],
         mode: str,
         is_chinese: bool,
     ):
@@ -189,21 +159,61 @@ class EventExtractionDataModule(TaskDataModule):
 
         if mode == "train":
             labels = []
-            for i, event_list in enumerate(examples[label_column_name]):
-                events_label = []
-                for e in event_list:
-                    event = []
-                    for p, h, t in e:
+            for b, events in enumerate(examples[label_column_name]):
+                argu_labels = {}
+                head_labels = []
+                tail_labels = []
+                for event in events:
+                    for i1, (event_type1, word1, head1, tail1) in enumerate(event):
+                        tp1 = predicate2id[event_type1]
+                        tail1 = tail1 - 1
                         try:
-                            h = tokenized_inputs.char_to_token(i, h)
-                            t = tokenized_inputs.char_to_token(i, t)
-                        except Exception:
+                            h1 = tokenized_inputs.char_to_token(b, head1)
+                            t1 = tokenized_inputs.char_to_token(b, tail1)
+                        except Exception as e:
+                            logger.info(f"{e} char_to_token error!")
                             continue
-                        if h is None or t is None:
+
+                        if h1 is None or t1 is None:
+                            logger.info("find None!")
                             continue
-                        event.append([p, h, t])
-                    events_label.append(event)
-                labels.append(events_label)
+
+                        if tp1 not in argu_labels:
+                            argu_labels[tp1] = [tp1]
+                        argu_labels[tp1].extend([h1, t1])
+
+                        for i2, (event_type2, word2, head2, tail2) in enumerate(event):
+                            if i2 > i1:
+                                tail2 = tail2 - 1
+                                try:
+                                    h2 = tokenized_inputs.char_to_token(b, head2)
+                                    t2 = tokenized_inputs.char_to_token(b, tail2)
+                                except Exception as e:
+                                    logger.info("char_to_token error!")
+                                    continue
+
+                                if h2 is None or t2 is None:
+                                    logger.info("find None!")
+                                    continue
+
+                                hl = [min(h1, h2), max(h1, h2)]
+                                tl = [min(t1, t2), max(t1, t2)]
+
+                                if hl not in head_labels:
+                                    head_labels.append(hl)
+
+                                if tl not in tail_labels:
+                                    tail_labels.append(tl)
+
+                argu_labels = list(argu_labels.values())
+                labels.append(
+                    {
+                        "argu_labels": argu_labels if len(argu_labels) > 0 else [[0, 0, 0]],
+                        "head_labels": head_labels if len(head_labels) > 0 else [[0, 0]],
+                        "tail_labels": tail_labels if len(tail_labels) > 0 else [[0, 0]]
+                    }
+                )
+
             tokenized_inputs["labels"] = labels
 
         return tokenized_inputs
