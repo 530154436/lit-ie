@@ -198,3 +198,15 @@ def batchify_re_labels(batch, features, return_offset_mapping=False):
         batch["offset_mapping"] = [feature.pop("offset_mapping") for feature in features]
 
     return batch
+
+
+def batchify_ee_labels(batch, features, return_offset_mapping=False):
+    """ 事件抽取验证集标签处理 """
+    if "text" in features[0].keys():
+        batch["texts"] = [feature.pop("text") for feature in features]
+    if "target" in features[0].keys():
+        batch['target'] = [{tuple(t) for t in feature.pop("target")} for feature in features]
+    if return_offset_mapping and "offset_mapping" in features[0].keys():
+        batch["offset_mapping"] = [feature.pop("offset_mapping") for feature in features]
+
+    return batch

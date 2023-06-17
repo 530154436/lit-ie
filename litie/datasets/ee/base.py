@@ -70,7 +70,7 @@ class EventExtractionDataModule(TaskDataModule):
 
     def process_data(self, dataset: Union[Dataset, Dict], stage: Optional[str] = None) -> Union[Dataset, Dict]:
         label_column_name, text_column_name = self._setup_input_fields(dataset, stage)
-        self._prepare_labels(dataset, label_column_name)
+        self._prepare_labels()
 
         convert_to_features_train = self.get_process_fct(text_column_name, label_column_name, "train")
         convert_to_features_val = self.get_process_fct(text_column_name, label_column_name, "val")

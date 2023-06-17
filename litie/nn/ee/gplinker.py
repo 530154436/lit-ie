@@ -157,7 +157,7 @@ def get_auto_gplinker_ee_model(
                 for p, h, t in zip(*np.where(_entity_logits > decode_thresh)):
                     if h >= (l - 1) or t >= (l - 1) or 0 in [h, t]:  # 排除[CLS]、[SEP]、[PAD]
                         continue
-                    p = id2predicate[p].rsplit('+', 1)
+                    p = id2predicate[p].rsplit('@', 1)
                     argus.add((*p, h, t))
 
                 # 构建链接
@@ -176,16 +176,19 @@ def get_auto_gplinker_ee_model(
                     for event in clique_search(list(sub_argus), links):
                         events.append([])
                         for argu in event:
+                            start, end = mapping[argu[2]][0], mapping[argu[3]][1]
                             events[-1].append(
                                 (
-                                    id2predicate['+'.join(argu[:2])],
-                                    text[mapping[argu[2]][0]: mapping[argu[3]][1]],
+                                    '@'.join(argu[:2]),
+                                    text[start: end],
+                                    start,
+                                    end,
                                 )
                             )
                         if self.has_trigger and all([argu[1] != "触发词" for argu in event]):
                             events.pop()
 
-                all_event_list.append(set([tuple(e) for e in events]))
+                all_event_list.append(events)
 
             return all_event_list
 

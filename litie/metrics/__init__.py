@@ -1,2 +1,2 @@
 from .base import Metric
-from .extraction.score import ExtractionScore
+from .extraction.score import ExtractionScore, EventExtractionScore

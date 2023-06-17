@@ -56,7 +56,7 @@ class DataCollatorForGPLinker:
             for it, (t1, t2) in enumerate(lb["tail_labels"]):
                 batch_tail_labels[b, 0, it, :] = torch.tensor([t1, t2], dtype=torch.long)
 
-        batch["argu_labels"] = batch_argu_labels
+        batch["argu_labels"] = batch_argu_labels.reshape(bs, self.num_predicates, max_argu_num, 2)
         batch["head_labels"] = batch_head_labels
         batch["tail_labels"] = batch_tail_labels
 
