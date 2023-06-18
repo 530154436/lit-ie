@@ -37,7 +37,7 @@ def set2json(events):
                 final_event["arguments"].append(
                     {
                         "role": role,
-                        "argument": argu[1]
+                        "argument": argu[2]
                     }
                 )
         event_list = [
