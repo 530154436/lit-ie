@@ -25,11 +25,11 @@ install_requires = [
 
 setup(
     name="litie",
-    version="0.0.2",
+    version="0.0.3",
     description="Pytorch-lightning Code Blocks for NER and RE",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/xusenlinzy/lit-ner",
+    url="https://github.com/xusenlinzy/lit-ie",
     author="xusenlin",
     author_email="1659821119@qq.com",
     ikeywords=["deep learning", "pytorch", "AI"],

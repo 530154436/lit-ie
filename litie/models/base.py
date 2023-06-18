@@ -95,6 +95,7 @@ class BaseModel:
                 monitor=kwargs.pop("monitor") if "monitor" in kwargs else "val_f1_micro",
                 save_top_k=1,
                 mode="max",
+                save_last=kwargs.pop("save_last") if "save_last" in kwargs else None
             )
 
             callbacks = [model_ckpt, LoggingCallback()]

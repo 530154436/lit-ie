@@ -161,7 +161,7 @@ class EventExtractionDataModule(TaskDataModule):
         if mode == "train":
             labels = []
             for b, events in enumerate(examples[label_column_name]):
-                argu_labels = [set() for _ in range(len(predicate2id))]
+                argu_labels = {}
                 head_labels, tail_labels = set(), set()
                 for event in events:
                     for i1, (event_type1, role1, word1, head1, tail1) in enumerate(event):
@@ -175,7 +175,10 @@ class EventExtractionDataModule(TaskDataModule):
 
                         if h1 is None or t1 is None:
                             continue
-                        argu_labels[tp1].add((h1, t1))
+
+                        if tp1 not in argu_labels:
+                            argu_labels[tp1] = [tp1]
+                        argu_labels[tp1].extend([h1, t1])
 
                         for i2, (event_type2, role2, word2, head2, tail2) in enumerate(event):
                             head2, tail2 = int(head2), int(tail2)
@@ -198,18 +201,14 @@ class EventExtractionDataModule(TaskDataModule):
                                 if tl not in tail_labels:
                                     tail_labels.add(tl)
 
-                for label in argu_labels + [head_labels, tail_labels]:
-                    if not label:  # 至少要有一个标签
-                        label.add((0, 0))  # 如果没有则用0填充
-
-                argu_labels = [list(l) for l in argu_labels]
+                argu_labels = list(argu_labels.values())
                 head_labels, tail_labels = list(head_labels), list(tail_labels)
 
                 labels.append(
                     {
-                        "argu_labels": argu_labels,
-                        "head_labels": head_labels,
-                        "tail_labels": tail_labels
+                        "argu_labels": argu_labels if len(argu_labels) > 0 else [[0, 0, 0]],
+                        "head_labels": head_labels if len(head_labels) > 0 else [[0, 0]],
+                        "tail_labels": tail_labels if len(tail_labels) > 0 else [[0, 0]]
                     }
                 )
 

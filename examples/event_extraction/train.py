@@ -40,7 +40,8 @@ def main():
         labels=labels,
         num_sanity_val_steps=0,
         monitor="val_f1",
-        check_val_every_n_epoch=20,
+        check_val_every_n_epoch=50,
+        save_last=True,
     )
 
     os.remove(os.path.join(training_args.output_dir, "best_model.ckpt"))
