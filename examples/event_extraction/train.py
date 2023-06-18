@@ -21,7 +21,7 @@ with open("datasets/duee/schema.json") as f:
         l = json.loads(l)
         t = l["event_type"]
         for r in ["触发词"] + [s["role"] for s in l["role_list"]]:
-            labels.append(f"{t}+{r}")
+            labels.append(f"{t}@{r}")
 
 
 def main():
@@ -35,7 +35,13 @@ def main():
     model = AutoEventExtractionModel(model_args=model_args, training_args=training_args)
 
     # 2. finetune model
-    model.finetune(data_args, labels=labels)
+    model.finetune(
+        data_args,
+        labels=labels,
+        num_sanity_val_steps=0,
+        monitor="val_f1",
+        check_val_every_n_epoch=20,
+    )
 
     os.remove(os.path.join(training_args.output_dir, "best_model.ckpt"))
 

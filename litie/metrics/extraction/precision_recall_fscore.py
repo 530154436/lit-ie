@@ -43,7 +43,7 @@ def extract_tp_actual_correct_for_event(y_true, y_pred):
         R, T = DedupList(), DedupList()
         # 事件级别
         for event in pred_events:
-            if any([argu[0].split("@")[-1] == "触发词" for argu in event]):
+            if any([argu[1] == "触发词" for argu in event]):
                 R.append(list(sorted(event)))
         for event in events:
             T.append(list(sorted(event)))
@@ -58,11 +58,11 @@ def extract_tp_actual_correct_for_event(y_true, y_pred):
         R, T = DedupList(), DedupList()
         for event in pred_events:
             for argu in event:
-                if argu[0].split("@")[-1] != "触发词":
+                if argu[1] != "触发词":
                     R.append(argu)
         for event in events:
             for argu in event:
-                if argu[0].split("@")[-1] != "触发词":
+                if argu[1] != "触发词":
                     T.append(argu)
         for argu in R:
             if argu in T:

@@ -28,11 +28,11 @@ def set2json(events):
     event_list = DedupList()
     for event in events:
         final_event = {
-            "event_type": event[0][0].split("@")[0],
+            "event_type": event[0][0],
             "arguments": DedupList()
         }
         for argu in event:
-            event_type, role = argu[0].split("@")
+            event_type, role = argu[0], argu[1]
             if role != "触发词":
                 final_event["arguments"].append(
                     {
@@ -151,7 +151,7 @@ class EventExtractionPipeline(object):
             texts = [texts]
 
         results = self.inference_backend.predict(
-            texts, batch_size=self._batch_size, max_length=self._max_seq_len, return_dict=False
+            texts, batch_size=self._batch_size, max_length=self._max_seq_len,
         )
 
         return results

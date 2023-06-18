@@ -10,7 +10,6 @@ from ..datasets.base import TaskDataModule
 from ..engines import TaskEngine
 from ..nn.model_utils import TOKENIZER_MAP
 from ..utils.imports import WANDB_AVAILABLE
-from ..utils.logger import logger
 
 
 class BaseModel:
@@ -69,12 +68,6 @@ class BaseModel:
         self.engine = self.create_engine()
         trainer = self.make_trainer(**trainer_kwargs)
 
-        logger.info("***** Running training *****")
-        logger.info(f"  Num Epochs = {trainer.max_epochs:,}")
-        logger.info(f"  Instantaneous batch size per device = {self.training_args.per_device_train_batch_size:,}")
-        logger.info(f"  Gradient Accumulation steps = {trainer.accumulate_grad_batches}")
-        logger.info(f"  Total optimization steps = {trainer.estimated_stepping_batches:,}")
-
         trainer.fit(self.engine, self.data_module)
 
     def make_trainer(self, accelerator="gpu", devices=1, callbacks=None, **kwargs):
@@ -99,7 +92,7 @@ class BaseModel:
             model_ckpt = ModelCheckpoint(
                 dirpath=str(self.training_args.output_dir),
                 filename="best_model",
-                monitor="val_f1_micro",
+                monitor=kwargs.pop("monitor") if "monitor" in kwargs else "val_f1_micro",
                 save_top_k=1,
                 mode="max",
             )

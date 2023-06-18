@@ -48,10 +48,11 @@ class EventExtractionDataModule(TaskDataModule):
             events.append(
                 [
                     [
-                        e["event_type"] + "@" + "触发词",
+                        e["event_type"],
+                        "触发词",
                         e["trigger"],
-                        e["trigger_start_index"] + offset1,
-                        e["trigger_start_index"] + offset1 + len(e["trigger"].strip()),
+                        str(e["trigger_start_index"] + offset1),
+                        str(e["trigger_start_index"] + offset1 + len(e["trigger"].strip())),
                     ]
                 ]
             )
@@ -59,10 +60,11 @@ class EventExtractionDataModule(TaskDataModule):
                 offset2 = len(a["argument"]) - len(a["argument"].lstrip())
                 events[-1].append(
                     [
-                        e["event_type"] + "@" + a["role"],
+                        e["event_type"],
+                        a["role"],
                         a["argument"],
-                        a["argument_start_index"] + offset2,
-                        a["argument_start_index"] + offset2 + len(a["argument"].strip()),
+                        str(a["argument_start_index"] + offset2),
+                        str(a["argument_start_index"] + offset2 + len(a["argument"].strip())),
                     ]
                 )
         del example["event_list"]
@@ -90,7 +92,6 @@ class EventExtractionDataModule(TaskDataModule):
         val_dataset = val_dataset.map(
             convert_to_features_val,
             batched=True,
-            remove_columns=[label_column_name],
             desc="Running tokenizer on validation datasets",
             new_fingerprint=f"validation-{self.validation_max_length}-{self.task_name}",
             num_proc=self.num_workers,
@@ -116,7 +117,7 @@ class EventExtractionDataModule(TaskDataModule):
         split = "train" if stage == "fit" else "validation"
         column_names = dataset[split].column_names
         text_column_name = "text" if "text" in column_names else column_names[0]
-        label_column_name = "target" if "target" in column_names else column_names[1]
+        label_column_name = "target"
         return label_column_name, text_column_name
 
     def _prepare_labels(self):
@@ -160,57 +161,55 @@ class EventExtractionDataModule(TaskDataModule):
         if mode == "train":
             labels = []
             for b, events in enumerate(examples[label_column_name]):
-                argu_labels = {}
-                head_labels = []
-                tail_labels = []
+                argu_labels = [set() for _ in range(len(predicate2id))]
+                head_labels, tail_labels = set(), set()
                 for event in events:
-                    for i1, (event_type1, word1, head1, tail1) in enumerate(event):
-                        tp1 = predicate2id[event_type1]
-                        tail1 = tail1 - 1
+                    for i1, (event_type1, role1, word1, head1, tail1) in enumerate(event):
+                        head1, tail1 = int(head1), int(tail1)
+                        tp1 = predicate2id["@".join([event_type1, role1])]
                         try:
                             h1 = tokenized_inputs.char_to_token(b, head1)
-                            t1 = tokenized_inputs.char_to_token(b, tail1)
-                        except Exception as e:
-                            logger.info(f"{e} char_to_token error!")
+                            t1 = tokenized_inputs.char_to_token(b, tail1 - 1)
+                        except:
                             continue
 
                         if h1 is None or t1 is None:
-                            logger.info("find None!")
                             continue
+                        argu_labels[tp1].add((h1, t1))
 
-                        if tp1 not in argu_labels:
-                            argu_labels[tp1] = [tp1]
-                        argu_labels[tp1].extend([h1, t1])
-
-                        for i2, (event_type2, word2, head2, tail2) in enumerate(event):
+                        for i2, (event_type2, role2, word2, head2, tail2) in enumerate(event):
+                            head2, tail2 = int(head2), int(tail2)
                             if i2 > i1:
-                                tail2 = tail2 - 1
                                 try:
                                     h2 = tokenized_inputs.char_to_token(b, head2)
-                                    t2 = tokenized_inputs.char_to_token(b, tail2)
-                                except Exception as e:
-                                    logger.info("char_to_token error!")
+                                    t2 = tokenized_inputs.char_to_token(b, tail2 - 1)
+                                except:
                                     continue
 
                                 if h2 is None or t2 is None:
-                                    logger.info("find None!")
                                     continue
 
-                                hl = [min(h1, h2), max(h1, h2)]
-                                tl = [min(t1, t2), max(t1, t2)]
+                                hl = (min(h1, h2), max(h1, h2))
+                                tl = (min(t1, t2), max(t1, t2))
 
                                 if hl not in head_labels:
-                                    head_labels.append(hl)
+                                    head_labels.add(hl)
 
                                 if tl not in tail_labels:
-                                    tail_labels.append(tl)
+                                    tail_labels.add(tl)
 
-                argu_labels = list(argu_labels.values())
+                for label in argu_labels + [head_labels, tail_labels]:
+                    if not label:  # 至少要有一个标签
+                        label.add((0, 0))  # 如果没有则用0填充
+
+                argu_labels = [list(l) for l in argu_labels]
+                head_labels, tail_labels = list(head_labels), list(tail_labels)
+
                 labels.append(
                     {
-                        "argu_labels": argu_labels if len(argu_labels) > 0 else [[0, 0, 0]],
-                        "head_labels": head_labels if len(head_labels) > 0 else [[0, 0]],
-                        "tail_labels": tail_labels if len(tail_labels) > 0 else [[0, 0]]
+                        "argu_labels": argu_labels,
+                        "head_labels": head_labels,
+                        "tail_labels": tail_labels
                     }
                 )
 

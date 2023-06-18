@@ -325,7 +325,7 @@ class TaskEngine(pl.LightningModule):
     def training_step(self, batch: Any, **kwargs: Any) -> torch.Tensor:
         outputs = self.model(**batch)
         loss = outputs[0]
-        self.log("train_loss", loss)
+        self.log("train_loss", loss, prog_bar=True)
         return loss
 
     def adversarial_step(self, batch: Any, **kwargs: Any) -> torch.Tensor:
@@ -367,7 +367,7 @@ class TaskEngine(pl.LightningModule):
         opt.step()
         scheduler and scheduler.step()
         self.model.zero_grad()
-
+        self.log("train_loss", loss, prog_bar=True)
         return loss
 
     def get_auto_model(self, model_type, task_model_name):

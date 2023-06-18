@@ -179,7 +179,8 @@ def get_auto_gplinker_ee_model(
                             start, end = mapping[argu[2]][0], mapping[argu[3]][1]
                             events[-1].append(
                                 (
-                                    '@'.join(argu[:2]),
+                                    argu[0],
+                                    argu[1],
                                     text[start: end],
                                     start,
                                     end,
