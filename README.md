@@ -340,7 +340,11 @@ data_args = DataTrainingArguments(
 )
 
 # 1. create model
-model = AutoEventExtractionModel(model_args=model_args, training_args=training_args)
+model = AutoEventExtractionModel(
+    task_model_name="gplinker",
+    model_name_or_path="hfl/chinese-roberta-wwm-ext",
+    training_args=training_args,
+)
 
 # 2. finetune model
 model.finetune(
