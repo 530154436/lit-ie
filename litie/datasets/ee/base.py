@@ -3,7 +3,6 @@ from functools import partial
 from typing import Any, Optional, Union, Dict
 
 from datasets import Dataset
-from pytorch_lightning.utilities import rank_zero_warn
 from transformers import PreTrainedTokenizerBase
 
 from ..base import TaskDataModule
@@ -126,10 +125,7 @@ class EventExtractionDataModule(TaskDataModule):
 
     @property
     def schemas(self):
-        if self.labels is None:
-            rank_zero_warn("Labels has not been set, calling `setup('fit')`.")
-            self.setup("fit")
-        return self.labels
+        return sorted(list(set(self.labels)))
 
     @staticmethod
     def convert_to_features(

@@ -248,3 +248,13 @@ python train.py \
     --other_learning_rate 2e-3 \
     --output_dir $OUTPUT_DIR/$TASK_NAME
 ```
+
+### 模型评估
+
+```shell
+python evaluate.py \
+    --eval_file datasets/cmeee/dev.json \
+    --task_model_name global_pointer \
+    --model_name_or_path outputs/global_pointer/bert-global_pointer \
+    --device cuda
+```

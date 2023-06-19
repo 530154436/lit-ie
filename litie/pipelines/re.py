@@ -136,7 +136,7 @@ class RelationExtractionPipeline(object):
         concat_results = []
         for k, vs in input_mapping.items():
             group_results = [short_results[v] for v in vs if len(short_results[v]) > 0]
-            single_results = set2json(set.union(*group_results))
+            single_results = set2json(set.union(*group_results)) if group_results else {}
             concat_results.append(single_results)
         return concat_results
 

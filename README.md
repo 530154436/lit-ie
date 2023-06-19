@@ -13,10 +13,7 @@
 此项目为开源**实体抽取和关系抽取**模型的训练和推理提供统一的框架，具有以下特性
 
 
-+ ✨ 支持多种开源实体抽取模型
-
-
-+ 🙌 支持多种开源关系抽取模型
++ ✨ 支持多种开源实体抽取、关系抽取和事件抽取模型
 
 
 + 👑 支持百度 [UIE](https://github.com/PaddlePaddle/PaddleNLP) 模型的训练和推理
@@ -30,6 +27,9 @@
 
 ## 📢 News 
 
++ 【2023.6.19】 增加 `gplinker` 事件抽取模型和代码示例
+
+
 + 【2023.6.15】 增加对抗训练功能和示例、增加 `onerel` 关系抽取模型
 
 
@@ -42,16 +42,18 @@
 
 ## 📦 安装
 
-### 环境依赖
-
-+ python >= 3.7
-
-+ torch >= 1.12
-
 ### pip 安装
 
 ```shell
 pip install --upgrade litie
+```
+
+### 源码安装
+
+```shell
+git clone https://github.com/xusenlinzy/lit-ie
+
+pip install -r requirements.txt
 ```
 
 
@@ -165,6 +167,57 @@ pip install --upgrade litie
   
     + `predicate`: 主体和客体之间的关系
 
+
+### 事件抽取
+
+将数据集处理成以下 `json` 格式
+
+```json
+{
+  "text": "油服巨头哈里伯顿裁员650人 因美国油气开采活动放缓",
+  "id": "f2d936214dc2cb1b873a75ee29a30ec9",
+  "event_list": [
+    {
+      "event_type": "组织关系-裁员",
+      "trigger": "裁员",
+      "trigger_start_index": 8,
+      "arguments": [
+        {
+          "argument_start_index": 0,
+          "role": "裁员方",
+          "argument": "油服巨头哈里伯顿"
+        },
+        {
+          "argument_start_index": 10,
+          "role": "裁员人数",
+          "argument": "650人"
+        }
+      ],
+      "class": "组织关系"
+    }
+  ]
+}
+```
+
+字段含义：
+
++ `text`: 文本内容
+
++ `event_list`: 该文本所包含的所有事件
+
+    + `event_type`: 事件类型
+
+    + `trigger`: 触发词
+  
+    + `trigger_start_index`: 触发词开始位置
+
+    + `arguments`: 论元
+  
+        + `role`: 论元角色
+      
+        + `argument`: 论元名称
+      
+        + `argument_start_index`: 论元名称开始位置
   
 ## 🚀 模型训练
 
@@ -237,6 +290,59 @@ os.remove(os.path.join(training_args.output_dir, "best_model.ckpt"))
 训练脚本详见 [relation_extraction](./examples/relation_extraction)
 
 
+### 事件抽取
+
+```python
+import json
+import os
+import sys
+
+from transformers import HfArgumentParser
+
+from litie.arguments import (
+    DataTrainingArguments,
+    ModelArguments,
+    TrainingArguments,
+)
+from litie.models import AutoEventExtractionModel
+
+os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
+
+schema_path = "datasets/duee/schema.json"
+
+labels = []
+with open("datasets/duee/schema.json") as f:
+    for l in f:
+        l = json.loads(l)
+        t = l["event_type"]
+        for r in ["触发词"] + [s["role"] for s in l["role_list"]]:
+            labels.append(f"{t}@{r}")
+
+parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
+if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
+    model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
+else:
+    model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+
+# 1. create model
+model = AutoEventExtractionModel(model_args=model_args, training_args=training_args)
+
+# 2. finetune model
+model.finetune(
+    data_args,
+    labels=labels,
+    num_sanity_val_steps=0,
+    monitor="val_f1",
+    check_val_every_n_epoch=100,
+    save_last=True,
+)
+
+os.remove(os.path.join(training_args.output_dir, "best_model.ckpt"))
+```
+
+训练脚本详见 [event_extraction](./examples/event_extraction)
+
+
 ## 📊 模型推理
 
 ### 实体抽取
@@ -280,15 +386,32 @@ from litie.ui import RelationExtractionPlayground
 RelationExtractionPlayground().launch()
 ```
 
+
+### 事件抽取
+
+```python
+from litie.pipelines import EventExtractionPipeline
+
+task_model = "gplinker"
+model_name_or_path = "path of gplinker model"
+pipeline = EventExtractionPipeline(task_model, model_name_or_path=model_name_or_path)
+
+print(pipeline("油服巨头哈里伯顿裁员650人 因美国油气开采活动放缓"))
+```
+
 ## 🍭 通用信息抽取
 
 + [UIE(Universal Information Extraction)](https://arxiv.org/pdf/2203.12277.pdf)：Yaojie Lu等人在ACL-2022中提出了通用信息抽取统一框架 `UIE`。
 
+
 + 该框架实现了实体抽取、关系抽取、事件抽取、情感分析等任务的统一建模，并使得不同任务间具备良好的迁移和泛化能力。
+
 
 + [PaddleNLP](https://github.com/PaddlePaddle/PaddleNLP)借鉴该论文的方法，基于 `ERNIE 3.0` 知识增强预训练模型，训练并开源了首个中文通用信息抽取模型 `UIE`。
 
+
 + 该模型可以支持不限定行业领域和抽取目标的关键信息抽取，实现零样本快速冷启动，并具备优秀的小样本微调能力，快速适配特定的抽取目标。
+
 
 ### 模型训练
 

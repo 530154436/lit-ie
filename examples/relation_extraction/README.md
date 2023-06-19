@@ -204,3 +204,13 @@ python train.py \
     --per_device_eval_batch_size 4 \
     --output_dir $OUTPUT_DIR/$TASK_NAME
 ```
+
+### 模型评估
+
+```shell
+python evaluate.py \
+    --eval_file datasets/duie/dev.json \
+    --task_model_name gplinker \
+    --model_name_or_path outputs/gplinker/bert-gplinker \
+    --device cuda
+```

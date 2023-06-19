@@ -118,10 +118,10 @@ def get_auto_gplinker_ee_model(
 
             loss, predictions = None, None
             if argu_labels is not None and head_labels is not None and tail_labels is not None:
-                entity_loss = self.compute_loss([argu_logits, argu_labels])
+                argu_loss = self.compute_loss([argu_logits, argu_labels])
                 head_loss = self.compute_loss([head_logits, head_labels])
                 tail_loss = self.compute_loss([tail_logits, tail_labels])
-                loss = (entity_loss + head_loss + tail_loss) / 3
+                loss = (argu_loss + head_loss + tail_loss) / 3
 
             if not self.training:
                 predictions = self.decode(
@@ -183,7 +183,7 @@ def get_auto_gplinker_ee_model(
                                     argu[1],
                                     text[start: end],
                                     start,
-                                    end,
+                                    end
                                 )
                             )
                         if self.has_trigger and all([argu[1] != "触发词" for argu in event]):
