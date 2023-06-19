@@ -10,7 +10,7 @@
     <a href="https://github.com/xusenlinzy/lit-ner"><img src="https://img.shields.io/badge/langurage-py-brightgreen?style=flat&color=blue"></a>
 </p>
 
-此项目为开源**实体抽取和关系抽取**模型的训练和推理提供统一的框架，具有以下特性
+此项目为开源**实体抽取、关系抽取和事件抽取**模型的训练和推理提供统一的框架，具有以下特性
 
 
 + ✨ 支持多种开源实体抽取、关系抽取和事件抽取模型
@@ -225,28 +225,36 @@ pip install -r requirements.txt
 
 ```python
 import os
-import sys
-
-from transformers import HfArgumentParser
 
 from litie.arguments import (
     DataTrainingArguments,
-    ModelArguments,
     TrainingArguments,
 )
 from litie.models import AutoNerModel
 
 os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
 
+training_args = TrainingArguments(
+    other_learning_rate=2e-3,
+    num_train_epochs=20,
+    per_device_train_batch_size=32,
+    per_device_eval_batch_size=32,
+    output_dir="outputs/crf",
+)
 
-parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
-if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
-    model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
-else:
-    model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+data_args = DataTrainingArguments(
+    dataset_name="datasets/cmeee",
+    train_file="train.json",
+    validation_file="dev.json",
+    preprocessing_num_workers=16,
+)
 
 # 1. create model
-model = AutoNerModel(model_args=model_args, training_args=training_args)
+model = AutoNerModel(
+    task_model_name="crf",
+    model_name_or_path="hfl/chinese-roberta-wwm-ext",
+    training_args=training_args,
+)
 
 # 2. finetune model
 model.finetune(data_args)
@@ -258,33 +266,38 @@ model.finetune(data_args)
 
 ```python
 import os
-import sys
-
-from transformers import HfArgumentParser
 
 from litie.arguments import (
     DataTrainingArguments,
-    ModelArguments,
     TrainingArguments,
 )
 from litie.models import AutoRelationExtractionModel
 
 os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
 
+training_args = TrainingArguments(
+    num_train_epochs=20,
+    per_device_train_batch_size=16,
+    per_device_eval_batch_size=16,
+    output_dir="outputs/gplinker",
+)
 
-parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
-if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
-    model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
-else:
-    model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+data_args = DataTrainingArguments(
+    dataset_name="datasets/duie",
+    train_file="train.json",
+    validation_file="dev.json",
+    preprocessing_num_workers=16,
+)
 
 # 1. create model
-model = AutoRelationExtractionModel(model_args=model_args, training_args=training_args)
+model = AutoRelationExtractionModel(
+    task_model_name="gplinker",
+    model_name_or_path="hfl/chinese-roberta-wwm-ext",
+    training_args=training_args,
+)
 
 # 2. finetune model
 model.finetune(data_args, num_sanity_val_steps=0)
-
-os.remove(os.path.join(training_args.output_dir, "best_model.ckpt"))
 ```
 
 训练脚本详见 [relation_extraction](./examples/relation_extraction)
@@ -293,17 +306,10 @@ os.remove(os.path.join(training_args.output_dir, "best_model.ckpt"))
 ### 事件抽取
 
 ```python
-import json
 import os
-import sys
+import json
 
-from transformers import HfArgumentParser
-
-from litie.arguments import (
-    DataTrainingArguments,
-    ModelArguments,
-    TrainingArguments,
-)
+from litie.arguments import DataTrainingArguments, TrainingArguments
 from litie.models import AutoEventExtractionModel
 
 os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
@@ -318,11 +324,20 @@ with open("datasets/duee/schema.json") as f:
         for r in ["触发词"] + [s["role"] for s in l["role_list"]]:
             labels.append(f"{t}@{r}")
 
-parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
-if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
-    model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
-else:
-    model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+training_args = TrainingArguments(
+    num_train_epochs=200,
+    per_device_train_batch_size=32,
+    per_device_eval_batch_size=32,
+    output_dir="outputs/gplinker",
+)
+
+data_args = DataTrainingArguments(
+    dataset_name="datasets/duee",
+    train_file="train.json",
+    validation_file="dev.json",
+    preprocessing_num_workers=16,
+    train_max_length=128,
+)
 
 # 1. create model
 model = AutoEventExtractionModel(model_args=model_args, training_args=training_args)
@@ -332,12 +347,9 @@ model.finetune(
     data_args,
     labels=labels,
     num_sanity_val_steps=0,
-    monitor="val_f1",
-    check_val_every_n_epoch=100,
-    save_last=True,
+    monitor="val_argu_f1",
+    check_val_every_n_epoch=20,
 )
-
-os.remove(os.path.join(training_args.output_dir, "best_model.ckpt"))
 ```
 
 训练脚本详见 [event_extraction](./examples/event_extraction)
@@ -398,6 +410,15 @@ pipeline = EventExtractionPipeline(task_model, model_name_or_path=model_name_or_
 
 print(pipeline("油服巨头哈里伯顿裁员650人 因美国油气开采活动放缓"))
 ```
+
+web demo
+
+```python
+from litie.ui import EventExtractionPlayground
+
+EventExtractionPlayground().launch()
+```
+
 
 ## 🍭 通用信息抽取
 

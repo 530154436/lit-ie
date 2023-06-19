@@ -214,3 +214,15 @@ python evaluate.py \
     --model_name_or_path outputs/gplinker/bert-gplinker \
     --device cuda
 ```
+
+### 模型结果
+
+|    模型    |          base model           |  val_f1  |  val_precision  |  val_recall  | 
+|:--------:|:-----------------------------:|:--------:|:---------------:|:------------:|
+|  casrel  |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
+| gplinker |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
+|   grte   |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
+|   pfn    |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
+|   prgc   |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
+|   spn    |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
+| tplinker |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 

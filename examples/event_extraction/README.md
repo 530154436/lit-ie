@@ -76,3 +76,10 @@ python evaluate.py \
     --model_name_or_path outputs/gplinker/bert-gplinker \
     --device cuda
 ```
+
+### 模型结果
+
+|     模型     |          base model           |  val_event_f1  |  val_event_precision  |  val_event_recall  |  val_argument_f1  |  val_argument_precision  |  val_argument_recall  |
+|:----------:|:-----------------------------:|:--------------:|:---------------------:|:------------------:|:-----------------:|:------------------------:|:---------------------:|
+|  gplinker  |  hfl/chinese-roberta-wwm-ext  |     48.73%     |        47.11%         |       50.46%       |      73.37%       |          74.80%          |        72.93%         |
+

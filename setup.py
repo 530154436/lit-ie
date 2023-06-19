@@ -25,7 +25,7 @@ install_requires = [
 
 setup(
     name="litie",
-    version="1.0.1",
+    version="1.0.2",
     description="Pytorch-lightning Code Blocks for NER and RE",
     long_description=long_description,
     long_description_content_type="text/markdown",

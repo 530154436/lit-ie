@@ -258,3 +258,16 @@ python evaluate.py \
     --model_name_or_path outputs/global_pointer/bert-global_pointer \
     --device cuda
 ```
+
+### 模型结果
+
+|        模型        |          base model           |  val_f1  |  val_precision  |  val_recall  | 
+|:----------------:|:-----------------------------:|:--------:|:---------------:|:------------:|
+|       crf        |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
+|  global_pointer  |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
+|       lear       |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
+|       mrc        |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
+|       span       |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
+|     tplinker     |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
+|      w2ner       |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
+|       cnn        |  hfl/chinese-roberta-wwm-ext  |          |                 |              | 
