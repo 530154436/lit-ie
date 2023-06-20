@@ -131,7 +131,7 @@ class W2NerDataModule(NerDataModule):
 
             length = len(tokens)
             # piece和word的对应关系
-            _pieces2word = np.zeros((length, len(_input_ids)))
+            _pieces2word = np.zeros((length, len(_input_ids)), dtype=np.int)
             if tokenizer is not None:
                 start = 0
                 for i, pieces in enumerate(tokens):
@@ -142,7 +142,7 @@ class W2NerDataModule(NerDataModule):
                     start += len(pieces)
 
             # 相对距离
-            _dist_inputs = np.zeros((length, length))
+            _dist_inputs = np.zeros((length, length), dtype=np.int)
             for k in range(length):
                 _dist_inputs[k, :] += k
                 _dist_inputs[:, k] -= k
@@ -154,8 +154,8 @@ class W2NerDataModule(NerDataModule):
             _dist_inputs[_dist_inputs == 0] = 19
 
             # 标签
-            _grid_labels = np.zeros((length, length))
-            _grid_mask = np.ones((length, length))
+            _grid_labels = np.zeros((length, length), dtype=np.int)
+            _grid_mask = np.ones((length, length), dtype=np.int)
 
             for entity in label:
                 _type = entity["label"]
@@ -206,7 +206,7 @@ class W2NerDataModule(NerDataModule):
 
             length = len(tokens)
             # piece和word的对应关系
-            _pieces2word = np.zeros((length, len(_input_ids)))
+            _pieces2word = np.zeros((length, len(_input_ids)), dtype=np.int)
             if tokenizer is not None:
                 start = 0
                 for i, pieces in enumerate(tokens):
@@ -217,7 +217,7 @@ class W2NerDataModule(NerDataModule):
                     start += len(pieces)
 
             # 相对距离
-            _dist_inputs = np.zeros((length, length))
+            _dist_inputs = np.zeros((length, length), dtype=np.int)
             for k in range(length):
                 _dist_inputs[k, :] += k
                 _dist_inputs[:, k] -= k
@@ -227,7 +227,7 @@ class W2NerDataModule(NerDataModule):
                     _dist_inputs[i, j]]
 
             _dist_inputs[_dist_inputs == 0] = 19
-            _grid_mask = np.ones((length, length))
+            _grid_mask = np.ones((length, length), dtype=np.int)
 
             for k, v in zip(input_keys, [_input_ids, _pieces2word, _dist_inputs, _grid_mask]):
                 encoded_inputs[k].append(v)
