@@ -14,7 +14,8 @@ def get_auto_span_ner_model(
     base_model: Optional[PreTrainedModel] = None,
     parent_model: Optional[PreTrainedModel] = None,
 ):
-    base_model, parent_model, base_model_name = MODEL_MAP[model_type]
+    if base_model is None and parent_model is None:
+        base_model, parent_model = MODEL_MAP[model_type]
 
     class SpanForNer(parent_model):
         """
