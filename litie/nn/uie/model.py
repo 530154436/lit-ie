@@ -1,39 +1,10 @@
-from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional
 
 import torch
 import torch.nn as nn
 from transformers import ErnieModel, ErniePreTrainedModel, PretrainedConfig
-from transformers.utils import ModelOutput
 
-
-@dataclass
-class UIEModelOutput(ModelOutput):
-    """
-    Output class for outputs of UIE.
-    losses (`torch.FloatTensor` of shape `(1,)`, *optional*, returned when `labels` is provided):
-        Total spn extraction losses is the sum of a Cross-Entropy for the start and end positions.
-    start_prob (`torch.FloatTensor` of shape `(batch_size, sequence_length)`):
-        Span-start scores (after Sigmoid).
-    end_prob (`torch.FloatTensor` of shape `(batch_size, sequence_length)`):
-        Span-end scores (after Sigmoid).
-    hidden_states (`tuple(torch.FloatTensor)`, *optional*, returned when `output_hidden_states=True` is passed or when `config.output_hidden_states=True`):
-        Tuple of `torch.FloatTensor` (one for the output of the embeddings, if the model has an embedding layers, +
-        one for the output of each layer) of shape `(batch_size, sequence_length, hidden_size)`.
-        Hidden-states of the model at the output of each layer plus the optional initial embedding outputs.
-    attentions (`tuple(torch.FloatTensor)`, *optional*, returned when `output_attentions=True` is passed or when `config.output_attentions=True`):
-        Tuple of `torch.FloatTensor` (one for each layer) of shape `(batch_size, num_heads, sequence_length,
-        sequence_length)`.
-        Attention weights after the attention softmax, used to compute the weighted average in the self-attention
-        heads.
-    """
-    loss: Optional[torch.FloatTensor] = None
-    start_prob: torch.FloatTensor = None
-    end_prob: torch.FloatTensor = None
-    start_positions: torch.FloatTensor = None
-    end_positions: torch.FloatTensor = None
-    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
-    attentions: Optional[Tuple[torch.FloatTensor]] = None
+from ..model_utils import UIEModelOutput
 
 
 class UIEModel(ErniePreTrainedModel):
@@ -76,7 +47,7 @@ class UIEModel(ErniePreTrainedModel):
         output_attentions: Optional[bool] = None,
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
-    ):
+    ) -> UIEModelOutput:
         """
         Args:
         input_ids (`torch.LongTensor` of shape `({0})`):

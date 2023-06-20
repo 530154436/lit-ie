@@ -2,14 +2,18 @@ from typing import Optional, List, Any
 
 import torch
 import torch.nn as nn
+from transformers import PreTrainedModel
 
 from ..model_utils import SpanOutput, MODEL_MAP
 from ...datasets.utils import tensor_to_cpu
 from ...losses import SpanLoss
 
 
-def get_auto_span_ner_model(model_type: str = "bert"):
-
+def get_auto_span_ner_model(
+    model_type: Optional[str] = "bert",
+    base_model: Optional[PreTrainedModel] = None,
+    parent_model: Optional[PreTrainedModel] = None,
+):
     base_model, parent_model, base_model_name = MODEL_MAP[model_type]
 
     class SpanForNer(parent_model):
