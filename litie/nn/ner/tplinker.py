@@ -151,7 +151,7 @@ def get_tplinker_ner_model_config(labels: list, **kwargs):
     model_config = {
         "num_labels": len(labels),
         "tplinker_label2id": label2id,
-        "shaking_type": "cln",
+        "shaking_type": "cln_plus",
         "decode_thresh": 0.,
     }
     model_config.update(kwargs)

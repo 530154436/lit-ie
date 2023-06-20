@@ -25,8 +25,8 @@ install_requires = [
 
 setup(
     name="litie",
-    version="1.0.1",
-    description="Pytorch-lightning Code Blocks for NER and RE",
+    version="0.2.0",
+    description="Pytorch-lightning Code Blocks for Information Extraction",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/xusenlinzy/lit-ie",

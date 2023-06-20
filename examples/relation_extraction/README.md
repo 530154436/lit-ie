@@ -215,14 +215,14 @@ python evaluate.py \
     --device cuda
 ```
 
-### 模型结果
+### 模型结果（DUEE部分数据）
 
-|    模型    |          base model           | val_f1 | val_precision | val_recall | 
-|:--------:|:-----------------------------:|:------:|:-------------:|:----------:|
-|  casrel  |  hfl/chinese-roberta-wwm-ext  |        |               |            | 
-| gplinker |  hfl/chinese-roberta-wwm-ext  | 79.77% |    80.08%     |   79.47%   | 
-|   grte   |  hfl/chinese-roberta-wwm-ext  |        |               |            | 
-|   pfn    |  hfl/chinese-roberta-wwm-ext  |        |               |            | 
-|   prgc   |  hfl/chinese-roberta-wwm-ext  |        |               |            | 
-|   spn    |  hfl/chinese-roberta-wwm-ext  |        |               |            | 
-| tplinker |  hfl/chinese-roberta-wwm-ext  |        |               |            | 
+|    模型    |       backbone model        | val_f1 | val_precision | val_recall | 
+|:--------:|:---------------------------:|:------:|:-------------:|:----------:|
+|  casrel  | hfl/chinese-roberta-wwm-ext |        |               |            | 
+| gplinker | hfl/chinese-roberta-wwm-ext | 79.77% |    80.08%     |   79.47%   | 
+|   grte   | hfl/chinese-roberta-wwm-ext | 79.55% |    78.17%     |   81.00%   | 
+|   pfn    | hfl/chinese-roberta-wwm-ext | 78.91% |    77.80%     |   80.06%   | 
+|   prgc   | hfl/chinese-roberta-wwm-ext |        |               |            | 
+|   spn    | hfl/chinese-roberta-wwm-ext |        |               |            | 
+| tplinker | hfl/chinese-roberta-wwm-ext |        |               |            | 

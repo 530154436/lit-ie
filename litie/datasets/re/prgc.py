@@ -69,17 +69,19 @@ class DataCollatorForPRGC:
                     seq_label[0, sh + 1: st + 1] = 2  # I-ENT
                     seq_label[1, oh] = 1  # B-ENT
                     seq_label[1, oh + 1: ot + 1] = 2  # I-ENT
+
                 new_batch["input_ids"].append(batch["input_ids"][i])
                 new_batch["attention_mask"].append(batch["attention_mask"][i])
                 new_batch["rel_labels"].append(rel_label)
                 new_batch["seq_labels"].append(seq_label)
                 new_batch["corres_labels"].append(corres_label)
-                new_batch["potential_rels"].append(p)
+                new_batch["potential_rels"].append(torch.tensor(p))
 
             # negtive samples
             neg_rels = set(range(self.num_predicates)).difference(set(spoes.keys()))
             if neg_rels:
                 neg_rels = random.sample(neg_rels, k=min(len(neg_rels), self.negative_ratio))
+
             for neg_rel in neg_rels:
                 # subject, object B-I-O label
                 seq_label = torch.zeros(2, seqlen, dtype=torch.long)
@@ -88,7 +90,7 @@ class DataCollatorForPRGC:
                 new_batch["rel_labels"].append(rel_label)
                 new_batch["seq_labels"].append(seq_label)
                 new_batch["corres_labels"].append(corres_label)
-                new_batch["potential_rels"].append(neg_rel)
+                new_batch["potential_rels"].append(torch.tensor(neg_rel))
 
         return {k: torch.stack(v) for k, v in new_batch.items()}
 

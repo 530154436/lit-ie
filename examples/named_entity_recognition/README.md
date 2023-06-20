@@ -261,13 +261,13 @@ python evaluate.py \
 
 ### 模型结果
 
-|        模型        |          base model           | val_f1 | val_precision | val_recall | 
-|:----------------:|:-----------------------------:|:------:|:-------------:|:----------:|
-|       crf        |  hfl/chinese-roberta-wwm-ext  | 64.44% |    64.03%     |   64.85%   | 
-|  global_pointer  |  hfl/chinese-roberta-wwm-ext  | 65.83% |    63.82%     |   67.96%   | 
-|       lear       |  hfl/chinese-roberta-wwm-ext  | 64.38% |    65.89%     |   62.94%   | 
-|       mrc        |  hfl/chinese-roberta-wwm-ext  |        |               |            | 
-|       span       |  hfl/chinese-roberta-wwm-ext  |        |               |            | 
-|     tplinker     |  hfl/chinese-roberta-wwm-ext  |        |               |            | 
-|      w2ner       |  hfl/chinese-roberta-wwm-ext  |        |               |            | 
-|       cnn        |  hfl/chinese-roberta-wwm-ext  | 65.87% |    66.22%     |   65.52%   | 
+|       模型       |       backbone model        |   val_f1   | val_precision | val_recall | 
+|:--------------:|:---------------------------:|:----------:|:-------------:|:----------:|
+|      crf       | hfl/chinese-roberta-wwm-ext |   64.44%   |    64.03%     |   64.85%   | 
+| global_pointer | hfl/chinese-roberta-wwm-ext |   65.83%   |    63.82%     | **67.96%** | 
+|      lear      | hfl/chinese-roberta-wwm-ext |   64.38%   |    65.89%     |   62.94%   | 
+|      mrc       | hfl/chinese-roberta-wwm-ext |   65.02%   |    64.01%     |   66.06%   | 
+|      span      | hfl/chinese-roberta-wwm-ext |   64.43%   |    65.82%     |   63.09%   | 
+|    tplinker    | hfl/chinese-roberta-wwm-ext |            |               |            | 
+|     w2ner      | hfl/chinese-roberta-wwm-ext |   65.22%   |     66.04     |   64.43%   | 
+|      cnn       | hfl/chinese-roberta-wwm-ext | **65.87%** |  **66.22%**   |   65.52%   | 

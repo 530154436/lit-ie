@@ -13,6 +13,6 @@ python train.py \
     --cache_dir $DATA_DIR/$TASK_NAME \
     --preprocessing_num_workers 16 \
     --num_train_epochs 10 \
-    --per_device_train_batch_size 2 \
+    --per_device_train_batch_size 8 \
     --per_device_eval_batch_size 2 \
     --output_dir $OUTPUT_DIR/$TASK_NAME
