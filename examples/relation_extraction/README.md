@@ -217,12 +217,12 @@ python evaluate.py \
 
 ### 模型结果（DUEE部分数据）
 
-|    模型    |       backbone model        | val_f1 | val_precision | val_recall | 
-|:--------:|:---------------------------:|:------:|:-------------:|:----------:|
-|  casrel  | hfl/chinese-roberta-wwm-ext |        |               |            | 
-| gplinker | hfl/chinese-roberta-wwm-ext | 79.77% |    80.08%     |   79.47%   | 
-|   grte   | hfl/chinese-roberta-wwm-ext | 79.55% |    78.17%     |   81.00%   | 
-|   pfn    | hfl/chinese-roberta-wwm-ext | 78.91% |    77.80%     |   80.06%   | 
-|   prgc   | hfl/chinese-roberta-wwm-ext |        |               |            | 
-|   spn    | hfl/chinese-roberta-wwm-ext |        |               |            | 
-| tplinker | hfl/chinese-roberta-wwm-ext |        |               |            | 
+|    模型    |       backbone model        |   val_f1   | val_precision | val_recall | 
+|:--------:|:---------------------------:|:----------:|:-------------:|:----------:|
+|  casrel  | hfl/chinese-roberta-wwm-ext |   79.05%   |    78.72%     |   79.37%   | 
+| gplinker | hfl/chinese-roberta-wwm-ext | **79.77%** |  **80.08%**   |   79.47%   | 
+|   grte   | hfl/chinese-roberta-wwm-ext |   79.55%   |    78.17%     | **81.00%** | 
+|   pfn    | hfl/chinese-roberta-wwm-ext |   78.91%   |    77.80%     |   80.06%   | 
+|   prgc   | hfl/chinese-roberta-wwm-ext |   79.16%   |    77.71%     |   80.66%   | 
+|   spn    | hfl/chinese-roberta-wwm-ext |     /      |       /       |     /      | 
+| tplinker | hfl/chinese-roberta-wwm-ext |   78.60%   |    77.16%     |   80.09%   | 

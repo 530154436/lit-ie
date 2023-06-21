@@ -3,11 +3,21 @@ from dataclasses import dataclass
 from typing import Optional, List, Any, Tuple
 
 import torch
-from transformers import AlbertModel, AlbertPreTrainedModel, AlbertTokenizer
-from transformers import BertModel, BertPreTrainedModel, BertTokenizerFast
-from transformers import ErnieModel, ErniePreTrainedModel
-from transformers import NezhaModel, NezhaPreTrainedModel
-from transformers import XLNetModel, XLNetPreTrainedModel, XLNetTokenizer
+from transformers import (
+    AlbertModel,
+    AlbertPreTrainedModel,
+    AlbertTokenizer,
+    BertModel,
+    BertPreTrainedModel,
+    BertTokenizerFast,
+    ErnieModel,
+    ErniePreTrainedModel,
+    NezhaModel,
+    NezhaPreTrainedModel,
+    XLNetModel,
+    XLNetPreTrainedModel,
+    XLNetTokenizer,
+)
 from transformers.file_utils import ModelOutput
 
 from .chinese_bert import ChineseBertModel, ChineseBertTokenizerFast

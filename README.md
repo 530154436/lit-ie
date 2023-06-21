@@ -10,10 +10,10 @@
     <a href="https://github.com/xusenlinzy/lit-ner"><img src="https://img.shields.io/badge/langurage-py-brightgreen?style=flat&color=blue"></a>
 </p>
 
-此项目为开源**实体抽取、关系抽取和事件抽取**模型的训练和推理提供统一的框架，具有以下特性
+此项目为开源**文本分类、实体抽取、关系抽取和事件抽取**模型的训练和推理提供统一的框架，具有以下特性
 
 
-+ ✨ 支持多种开源实体抽取、关系抽取和事件抽取模型
++ ✨ 支持多种开源文本分类、实体抽取、关系抽取和事件抽取模型
 
 
 + 👑 支持百度 [UIE](https://github.com/PaddlePaddle/PaddleNLP) 模型的训练和推理
@@ -27,6 +27,9 @@
 
 ## 📢 News 
 
++ 【2023.6.21】 增加文本分类代码示例
+
+
 + 【2023.6.19】 增加 `gplinker` 事件抽取模型和代码示例
 
 
@@ -35,8 +38,6 @@
 
 + 【2023.6.14】 新增 `UIE` 模型代码示例
 
-
-+ 【2023.6.13】 增加实体抽取和关系抽取代码示例
 
 ---
 

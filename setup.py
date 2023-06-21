@@ -10,7 +10,7 @@ install_requires = [
     "datasets",
     "jieba",
     "pypinyin",
-    "pytorch_lightning",
+    "pytorch_lightning==2.0.3",
     "scikit_learn",
     "scipy",
     "seaborn",
@@ -18,14 +18,14 @@ install_requires = [
     "setuptools",
     "spacy",
     "gradio",
-    "torchmetrics",
-    "transformers",
+    "torchmetrics==0.11.4",
+    "transformers>=4.30.2",
 ]
 
 
 setup(
     name="litie",
-    version="0.2.1",
+    version="0.2.2",
     description="Pytorch-lightning Code Blocks for Information Extraction",
     long_description=long_description,
     long_description_content_type="text/markdown",
