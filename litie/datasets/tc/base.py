@@ -1,5 +1,5 @@
 from typing import Any, List, Optional, Callable
-
+from .rdrop import DataCollatorForRDrop
 from datasets import ClassLabel, Dataset
 from pytorch_lightning.utilities import rank_zero_warn
 from transformers import PreTrainedTokenizerBase
@@ -9,6 +9,15 @@ from ..base import TaskDataModule
 
 
 class TextClassificationDataModule(TaskDataModule):
+    def __init__(
+        self,
+        *args,
+        use_rdrop: bool = False,
+        **kwargs,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+
+        self.use_rdrop = use_rdrop
 
     def process_data(self, dataset: Dataset, stage: Optional[str] = None) -> Dataset:
         input_feature_fields = [k for k, v in dataset["train"].features.items() if k not in ["label", "idx", "id"]]
@@ -70,4 +79,4 @@ class TextClassificationDataModule(TaskDataModule):
 
     @property
     def collate_fn(self) -> Optional[Callable]:
-        return DataCollatorWithPadding(self.tokenizer)
+        return DataCollatorWithPadding(self.tokenizer) if not self.use_rdrop else DataCollatorForRDrop(self.tokenizer)

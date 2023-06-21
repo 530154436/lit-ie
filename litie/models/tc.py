@@ -47,4 +47,5 @@ class AutoTextClassificationModel(BaseModel):
             limit_train_samples=data_args.max_train_samples,
             limit_val_samples=data_args.max_eval_samples,
             cache_dir=cache_dir if cache_dir else self.model_args.cache_dir,
+            use_rdrop=(self.model_config_kwargs.get("loss_type", "cross_entropy") == "r-drop"),
         )

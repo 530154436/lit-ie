@@ -9,6 +9,7 @@ from transformers.modeling_outputs import SequenceClassifierOutput
 from ..model_utils import MODEL_MAP
 from ...layers.dropouts import MultiSampleDropout
 from ...layers.pooling import Pooler
+from ...losses import RDropLoss, FocalLoss, LabelSmoothingCrossEntropy
 
 
 def get_auto_fc_tc_model(
@@ -86,7 +87,16 @@ def get_auto_fc_tc_model(
 
         def compute_loss(self, inputs):
             logits, labels = inputs[:2]
-            loss_fct = CrossEntropyLoss()
+            loss_type = getattr(self.config, "loss_type", "cross_entropy")
+            if loss_type == "r-drop":
+                alpha = getattr(self.config, "alpha", 4)
+                loss_fct = RDropLoss(alpha=alpha, rank="updown")
+            elif loss_type == "focal":
+                loss_fct = FocalLoss()
+            elif loss_type == "label-smoothing":
+                loss_fct = LabelSmoothingCrossEntropy()
+            else:
+                loss_fct = CrossEntropyLoss()
             return loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
 
     return SequenceClassification
