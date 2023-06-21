@@ -105,4 +105,4 @@ python evaluate.py \
 | 模型  |       backbone model        | val_accuracy | val_precision | val_recall | 
 |:---:|:---------------------------:|:------------:|:-------------:|:----------:|
 | fc  | hfl/chinese-roberta-wwm-ext |    95.53%    |    95.58%     |   95.53%   |
-| mdp | hfl/chinese-roberta-wwm-ext |    79.05%    |    78.72%     |   79.37%   |
+| mdp | hfl/chinese-roberta-wwm-ext |  **96.19%**  |  **96.24%**   | **96.19%** |
