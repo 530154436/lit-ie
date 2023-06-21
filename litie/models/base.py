@@ -1,6 +1,6 @@
 from typing import Optional, Any, Union, List, Dict
 
-from pytorch_lightning import Trainer
+from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint
 from transformers import PreTrainedTokenizerBase, BertTokenizerFast, PreTrainedModel
 
@@ -60,6 +60,9 @@ class BaseModel:
         labels: Optional[Union[Dict[str, Any], List[Any]]] = None,
         **trainer_kwargs,
     ):
+        # set random seed
+        seed_everything(self.training_args.seed)
+
         if self.tokenizer is None and self.model_name_or_path is not None:
             tokenizer_cls = TOKENIZER_MAP.get(self.model_type, BertTokenizerFast)
             self.tokenizer = tokenizer_cls.from_pretrained(self.model_name_or_path)

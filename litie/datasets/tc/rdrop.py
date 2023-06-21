@@ -22,10 +22,10 @@ class DataCollatorForRDrop:
             return_tensors="pt",
         )
 
-        batch = {k: v.repeat(2, 1) for k, v in batch.items()}
+        batch = {k: v.reshape(-1).repeat(2) if k == "labels" else v.repeat(2, 1) for k, v in batch.items()}
 
         if "label" in batch:
-            batch["labels"] = batch["label"].repeat(2)
+            batch["labels"] = batch["label"].reshape(-1).repeat(2)
             del batch["label"]
 
         return batch

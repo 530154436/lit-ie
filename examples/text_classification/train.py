@@ -21,7 +21,11 @@ def main():
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
     # 1. create model
-    model = AutoTextClassificationModel(model_args=model_args, training_args=training_args)
+    model = AutoTextClassificationModel(
+        model_args=model_args,
+        training_args=training_args,
+        model_config_kwargs={"loss_type": training_args.loss_type},
+    )
 
     # 2. finetune model
     model.finetune(data_args, monitor="val_accuracy")

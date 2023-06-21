@@ -300,3 +300,15 @@ class TrainingArguments:
             "help": "Adversarial training nums of attacks."
         }
     )
+    seed: int = field(
+        default=42,
+        metadata={
+            "help": "Random seed."
+        }
+    )
+    loss_type: str = field(
+        default="cross_entropy",
+        metadata={
+            "help": "Loss type for computing object."
+        }
+    )

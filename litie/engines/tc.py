@@ -37,12 +37,14 @@ class TextClassificationEngine(TaskEngine):
 
     def common_step(self, batch: Any) -> None:
         outputs = self.model(**batch)
-        loss = outputs.loss
         logits = outputs.logits
-        preds = torch.argmax(logits, dim=1)
+
+        num_examples = logits.shape[0] // 2
+        preds = torch.argmax(logits, dim=1)[:num_examples]
+        labels = batch["labels"][:num_examples]
 
         for k, metric in self.metrics.items():
-            metric.update(preds, batch["labels"])
+            metric.update(preds, labels)
 
     def common_epoch_end(self, prefix: str):
         metric_dict = self.compute_metrics(mode=prefix)
@@ -65,10 +67,9 @@ class TextClassificationEngine(TaskEngine):
         return self.common_epoch_end("test")
 
     def configure_metrics(self, _) -> None:
-        task = "multiclass"
-        self.precision = torchmetrics.Precision(task, num_classes=self.num_classes, average="macro")
-        self.recall = torchmetrics.Recall(task, num_classes=self.num_classes, average="macro")
-        self.accuracy = torchmetrics.Accuracy(task, num_classes=self.num_classes, average="macro")
+        self.precision = torchmetrics.Precision("multiclass", num_classes=self.num_classes, average="macro")
+        self.recall = torchmetrics.Recall("multiclass", num_classes=self.num_classes, average="macro")
+        self.accuracy = torchmetrics.Accuracy("multiclass", num_classes=self.num_classes, average="macro")
 
         self.metrics = {
             "precision": self.precision,

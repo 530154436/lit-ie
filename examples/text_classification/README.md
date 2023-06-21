@@ -102,8 +102,9 @@ python evaluate.py \
 
 ### 模型结果（DUEE部分数据）
 
-|    模型    |       backbone model        | val_accuracy | val_precision | val_recall | 
-|:--------:|:---------------------------:|:------------:|:-------------:|:----------:|
-|    fc    | hfl/chinese-roberta-wwm-ext |    95.53%    |    95.58%     |   95.53%   |
-|   mdp    | hfl/chinese-roberta-wwm-ext |    96.19%    |    96.24%     |   96.19%   |
-| fc + fgm | hfl/chinese-roberta-wwm-ext |  **96.34%**  |  **96.37%**   | **96.34%** |
+|     模型      |       backbone model        | val_accuracy | val_precision | val_recall | 
+|:-----------:|:---------------------------:|:------------:|:-------------:|:----------:|
+|     fc      | hfl/chinese-roberta-wwm-ext |    95.53%    |    95.58%     |   95.53%   |
+|     mdp     | hfl/chinese-roberta-wwm-ext |    96.19%    |    96.24%     |   96.19%   |
+|  fc + fgm   | hfl/chinese-roberta-wwm-ext |  **96.34%**  |  **96.37%**   | **96.34%** |
+| fc + r-drop | hfl/chinese-roberta-wwm-ext |    96.07%    |    96.07%     |   96.07%   |
