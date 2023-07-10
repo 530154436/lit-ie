@@ -1,5 +1,8 @@
-# Lit-IE
-
+<p align="center">
+    <br>
+    <img src="images/logo.png" width="400"/>
+    <br>
+<p>
 <p align="center">
     <a href="https://github.com/xusenlinzy/lit-ner"><img src="https://img.shields.io/github/license/xusenlinzy/lit-ner"></a>
     <a href=""><img src="https://img.shields.io/badge/python-3.8+-aff.svg"></a>

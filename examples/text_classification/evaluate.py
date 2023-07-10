@@ -8,11 +8,15 @@ from litie.utils.logger import logger
 
 
 def evaluate():
-    texts, labels = [], []
+    texts_a, texts_b, labels = [], [], []
     with open(args.eval_file, "r") as f:
         for line in f:
             line = json.loads(line)
-            texts.append(line["text"].strip())
+            if "sentence1" in line and "sentence2" in line:
+                texts_a.append(line["sentence1"].strip())
+                texts_b.append(line["sentence2"].strip())
+            else:
+                texts_a.append(line["text"].strip())
             labels.append(line["label"].strip())
 
     pipeline = TextClassificationPipeline(
@@ -25,7 +29,7 @@ def evaluate():
         device=args.device,
     )
 
-    predictions = pipeline(texts)
+    predictions = pipeline(texts_a, text_b=texts_b if texts_b else None)
 
     logger.info(classification_report(labels, predictions))
 

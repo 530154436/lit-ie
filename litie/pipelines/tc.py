@@ -51,7 +51,7 @@ class TextClassificationPredictor(BasePredictor):
             inputs = self._prepare_inputs(inputs)
             outputs = self.model(**inputs)
 
-            outputs = np.asarray(outputs['logits']).argmax(-1)
+            outputs = np.asarray(outputs['logits'].cpu()).argmax(-1)
             output_list.extend(outputs)
 
         if hasattr(self.model.config, "tc_label2id"):

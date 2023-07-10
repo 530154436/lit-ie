@@ -10,7 +10,7 @@ install_requires = [
     "datasets",
     "jieba",
     "pypinyin",
-    "pytorch_lightning==2.0.3",
+    "pytorch_lightning>=2.0.3",
     "scikit_learn",
     "scipy",
     "seaborn",
@@ -25,7 +25,7 @@ install_requires = [
 
 setup(
     name="litie",
-    version="0.2.3",
+    version="0.2.4",
     description="Pytorch-lightning Code Blocks for Information Extraction",
     long_description=long_description,
     long_description_content_type="text/markdown",
