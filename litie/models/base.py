@@ -69,8 +69,8 @@ class BaseModel:
 
         self.data_module = self.create_data_module(data_args, is_chinese, cache_dir, labels=labels)
         self.engine = self.create_engine()
-        trainer = self.make_trainer(**trainer_kwargs)
 
+        trainer = self.make_trainer(**trainer_kwargs)
         trainer.fit(self.engine, self.data_module)
 
     def make_trainer(self, accelerator="gpu", devices=1, callbacks=None, **kwargs):

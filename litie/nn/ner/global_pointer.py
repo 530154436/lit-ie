@@ -55,7 +55,7 @@ def get_auto_global_pointer_ner_model(
                     config.head_size,
                     use_rope=config.use_rope
                 )
-            elif head_type == "gplinker":
+            elif head_type == "global_pointer":
                 self.global_pointer = GlobalPointer(
                     config.hidden_size,
                     config.num_labels,

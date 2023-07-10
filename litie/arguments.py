@@ -87,6 +87,12 @@ class DataTrainingArguments:
             "help": "Whether the language is Chinese."
         }
     )
+    is_sparse: bool = field(
+        default=False,
+        metadata={
+            "help": "Whether to use sparse loss."
+        }
+    )
     overwrite_cache: bool = field(
         default=False,
         metadata={

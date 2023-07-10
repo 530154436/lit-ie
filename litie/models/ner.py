@@ -30,6 +30,10 @@ class AutoNerModel(BaseModel):
         cache_dir: Optional[str] = None,
         labels: Optional[Union[Dict[str, int], List[Any]]] = None,
     ):
+        kwargs = {}
+        if data_args.is_sparse:
+            kwargs = {"sparse": True}
+
         return AutoNerDataModule.create(
             self.task_model_name,
             self.tokenizer,
@@ -49,4 +53,5 @@ class AutoNerModel(BaseModel):
             cache_dir=cache_dir if cache_dir else self.model_args.cache_dir,
             task_name=f"{self.model_type}-{self.task_model_name}",
             is_chinese=is_chinese if is_chinese else data_args.is_chinese,
+            **kwargs
         )
