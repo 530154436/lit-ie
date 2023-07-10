@@ -16,5 +16,5 @@ python train_egp_sparse.py \
     --num_train_epochs 10 \
     --per_device_train_batch_size 32 \
     --per_device_eval_batch_size 16 \
-    --other_learning_rate 1e-5 \
+    --other_learning_rate 2e-4 \
     --output_dir $OUTPUT_DIR/$TASK_NAME
