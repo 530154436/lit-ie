@@ -1,7 +1,7 @@
 export TASK_NAME=uie
 export MODEL_NAME_OR_PATH=xusenlin/uie-base
 export OUTPUT_DIR=outputs
-export DATA_DIR=datasets/12315
+export DATA_DIR=datasets/DuIE
 
 python train.py \
     --task_name $TASK_NAME \

@@ -8,8 +8,8 @@
 
 ```bash
 python doccano.py \
-     --doccano_file datasets/12315/doccano.json \
-    --save_dir datasets/12315 
+     --doccano_file datasets/DuIE/doccano_ext.json \
+    --save_dir datasets/DuIE 
 ```
 
 参数说明：
@@ -51,15 +51,15 @@ python doccano.py \
 
 ```json
 {
-  "content": "2022年4月份在天猫上购买武汉市硚口区常码头785号常码头汽配用品市场30栋24号，武汉海本实业有限公司的汽车修补漆的套装，消费47元，联系商家无果，后发现商家发的是与实际需要的不符，并且需要的商品海没有发过来，并且里面的商品是坏的，退货无果，现要求商家退货退款，请调解。网购  订单号：2596256964285702840（联系此电话：王先生13420340362）",
+  "content": "王国维，字静安，又字伯隅，号观堂",
   "result_list": [
     {
-      "text": "天猫",
-      "start": 9,
-      "end": 11
+      "text": "观堂",
+      "start": 14,
+      "end": 16
     }
   ],
-  "prompt": "电商平台"
+  "prompt": "王国维的号"
 }
 ```
 
@@ -84,3 +84,13 @@ python train.py \
     --per_device_eval_batch_size 4 \
     --output_dir $OUTPUT_DIR/$TASK_NAME
 ```
+
+### 模型结果（DUIE 100条数据）
+
+|         DA method         | backbone model |   val_f1   | val_precision | val_recall | 
+|:-------------------------:|:--------------:|:----------:|:-------------:|:----------:|
+|         Baseline          |    uie_base    |   83.33%   |    78.43%     |   88.89%   | 
+|         Swap SPO          |    uie_base    | 84.55% (↑) |  78.85%* (↑)  | 91.11% (↑) | 
+|         Auto Neg          |    uie_base    |            |               |            | 
+|      Mask Then Fill       |    uie_base    |            |               |            | 
+| Mask Then Fill & Auto Neg |    uie_base    |            |               |            | 
